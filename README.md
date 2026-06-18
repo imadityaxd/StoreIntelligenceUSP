@@ -1,4 +1,4 @@
-Lead Developers - Adittya Sharma, Devyanshv Agrawal
+Lead Developers - Adittya Sharma, Devyanshuv Agrawal
 
 # Vivid Store AI - CCTV Retail Systems
 
