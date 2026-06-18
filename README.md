@@ -1,3 +1,5 @@
+Lead Developers - Adittya Sharma, Devyanshv Agrawal
+
 # Vivid Store AI - CCTV Retail Systems
 
 AI-powered CCTV retail analytics: footage -> tracked people -> live metrics -> session report.
