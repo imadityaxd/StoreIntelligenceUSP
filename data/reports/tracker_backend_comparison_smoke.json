@@ -1,0 +1,61 @@
+{
+  "video_path": "D:\\code\\purplletech\\Store 1-20260602T101818Z-3-001ec38db8\\Store 1\\CAM 5 - billing.mp4",
+  "store_id": "STORE_BLR_002",
+  "camera_id": "CAM_5",
+  "role": "billing",
+  "max_seconds": 1.0,
+  "results": [
+    {
+      "backend_requested": "auto",
+      "backend_active": "botsort",
+      "profile": {
+        "profile_name": "store1_billing_counter",
+        "tracker_backend": "botsort",
+        "process_fps": 4.0,
+        "yolo_conf": 0.35,
+        "yolo_iou": 0.35,
+        "yolo_imgsz": 960,
+        "min_area": 800,
+        "max_seconds": 180.0,
+        "profile_version": "TRACKER_PROFILES_V1",
+        "store_id": "STORE_BLR_002",
+        "camera_id": "CAM_5",
+        "camera_role": "billing"
+      },
+      "frames_sampled": 5,
+      "detections_total": 5,
+      "assigned_ids_total": 5,
+      "unique_track_count": 1,
+      "avg_tracks_per_sampled_frame": 1,
+      "max_tracks_in_frame": 1,
+      "predicted_track_samples": 0,
+      "tracker_id_assignment_rate": 1.0
+    },
+    {
+      "backend_requested": "centroid",
+      "backend_active": "centroid",
+      "profile": {
+        "profile_name": "store1_billing_counter",
+        "tracker_backend": "botsort",
+        "process_fps": 4.0,
+        "yolo_conf": 0.35,
+        "yolo_iou": 0.35,
+        "yolo_imgsz": 960,
+        "min_area": 800,
+        "max_seconds": 180.0,
+        "profile_version": "TRACKER_PROFILES_V1",
+        "store_id": "STORE_BLR_002",
+        "camera_id": "CAM_5",
+        "camera_role": "billing"
+      },
+      "frames_sampled": 5,
+      "detections_total": 5,
+      "assigned_ids_total": 5,
+      "unique_track_count": 1,
+      "avg_tracks_per_sampled_frame": 1,
+      "max_tracks_in_frame": 1,
+      "predicted_track_samples": 0,
+      "tracker_id_assignment_rate": 1.0
+    }
+  ]
+}

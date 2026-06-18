@@ -1,0 +1,222 @@
+{
+  "store_id": "STORE_BLR_003",
+  "store_name": "Purplle Brigade Road Store 2",
+  "timezone": "Asia/Kolkata",
+  "open_hours": {
+    "open": "10:00",
+    "close": "22:00"
+  },
+  "cameras": [
+    {
+      "camera_id": "CAM_1",
+      "role": "entry",
+      "description": "Entry threshold 1",
+      "zones_normalized": {
+        "ENTRY_EXIT": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            1.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    {
+      "camera_id": "CAM_2",
+      "role": "entry",
+      "description": "Entry threshold 2",
+      "zones_normalized": {
+        "ENTRY_EXIT": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            1.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    },
+    {
+      "camera_id": "CAM_3",
+      "role": "zone",
+      "description": "Main floor zone coverage",
+      "zones_normalized": {
+        "ZONE_LEFT_WALL": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            0.35,
+            0.0
+          ],
+          [
+            0.35,
+            1.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ],
+        "ZONE_RIGHT_WALL": [
+          [
+            0.65,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            1.0
+          ],
+          [
+            0.65,
+            1.0
+          ]
+        ],
+        "ZONE_GONDOLA": [
+          [
+            0.3,
+            0.3
+          ],
+          [
+            0.7,
+            0.3
+          ],
+          [
+            0.7,
+            0.75
+          ],
+          [
+            0.3,
+            0.75
+          ]
+        ],
+        "ZONE_MAKEUP": [
+          [
+            0.35,
+            0.0
+          ],
+          [
+            0.65,
+            0.0
+          ],
+          [
+            0.65,
+            0.35
+          ],
+          [
+            0.35,
+            0.35
+          ]
+        ]
+      }
+    },
+    {
+      "camera_id": "CAM_4",
+      "role": "billing",
+      "description": "Billing area",
+      "zones_normalized": {
+        "BILLING_COUNTER": [
+          [
+            0.0,
+            0.0
+          ],
+          [
+            1.0,
+            0.0
+          ],
+          [
+            1.0,
+            1.0
+          ],
+          [
+            0.0,
+            1.0
+          ]
+        ]
+      }
+    }
+  ],
+  "zones": [
+    {
+      "zone_id": "ENTRY_EXIT",
+      "label": "Entry/Exit",
+      "kind": "entry",
+      "camera_ids": [
+        "CAM_1",
+        "CAM_2"
+      ],
+      "sku_zone": null
+    },
+    {
+      "zone_id": "ZONE_LEFT_WALL",
+      "label": "Left Wall Units",
+      "kind": "product_zone",
+      "camera_ids": [
+        "CAM_3"
+      ],
+      "sku_zone": "SKINCARE"
+    },
+    {
+      "zone_id": "ZONE_RIGHT_WALL",
+      "label": "Right Wall Units",
+      "kind": "product_zone",
+      "camera_ids": [
+        "CAM_3"
+      ],
+      "sku_zone": "MAKEUP"
+    },
+    {
+      "zone_id": "ZONE_GONDOLA",
+      "label": "Gondola Center",
+      "kind": "floor",
+      "camera_ids": [
+        "CAM_3"
+      ],
+      "sku_zone": "MAKEUP"
+    },
+    {
+      "zone_id": "ZONE_MAKEUP",
+      "label": "Makeup Units",
+      "kind": "product_zone",
+      "camera_ids": [
+        "CAM_3"
+      ],
+      "sku_zone": "MAKEUP"
+    },
+    {
+      "zone_id": "BILLING_COUNTER",
+      "label": "Cash Counter",
+      "kind": "billing",
+      "camera_ids": [
+        "CAM_4"
+      ],
+      "sku_zone": null
+    }
+  ]
+}

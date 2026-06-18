@@ -1,0 +1,266 @@
+[
+  {
+    "transaction_id": "ML0426KAP0001358",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T11:25:36+00:00",
+    "basket_value_inr": 2048.97,
+    "metadata": {
+      "order_id": "104363838",
+      "customer_number": "9346413680",
+      "salesperson_id": "1178"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001399",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T13:51:55+00:00",
+    "basket_value_inr": 3467.1800000000003,
+    "metadata": {
+      "order_id": "104377545",
+      "customer_number": "9986216644",
+      "salesperson_id": "971"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001353",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T11:15:32+00:00",
+    "basket_value_inr": 3076.98,
+    "metadata": {
+      "order_id": "104362899",
+      "customer_number": "9900244874",
+      "salesperson_id": "971"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001384",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T13:11:51+00:00",
+    "basket_value_inr": 2564.1,
+    "metadata": {
+      "order_id": "104373042",
+      "customer_number": "9188142680",
+      "salesperson_id": "523"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001393",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T13:32:09+00:00",
+    "basket_value_inr": 2295.96,
+    "metadata": {
+      "order_id": "104375288",
+      "customer_number": "9972974352",
+      "salesperson_id": "737"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001333",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T08:11:55+00:00",
+    "basket_value_inr": 198.0,
+    "metadata": {
+      "order_id": "104346717",
+      "customer_number": "9902843091",
+      "salesperson_id": "523"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001408",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T14:24:02+00:00",
+    "basket_value_inr": 1354.79,
+    "metadata": {
+      "order_id": "104380754",
+      "customer_number": "9845789663",
+      "salesperson_id": "1190"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001324",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T07:12:18+00:00",
+    "basket_value_inr": 8243.230000000001,
+    "metadata": {
+      "order_id": "104341290",
+      "customer_number": "9611400437",
+      "salesperson_id": "971"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001369",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T12:25:02+00:00",
+    "basket_value_inr": 1495.98,
+    "metadata": {
+      "order_id": "104369411",
+      "customer_number": "8310361706",
+      "salesperson_id": "1190"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001321",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T06:45:05+00:00",
+    "basket_value_inr": 1247.98,
+    "metadata": {
+      "order_id": "104338647",
+      "customer_number": "7483373325",
+      "salesperson_id": "1178"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001336",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T08:25:16+00:00",
+    "basket_value_inr": 199.0,
+    "metadata": {
+      "order_id": "104347785",
+      "customer_number": "9880557837",
+      "salesperson_id": "0"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001418",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T14:55:04+00:00",
+    "basket_value_inr": 897.99,
+    "metadata": {
+      "order_id": "104383803",
+      "customer_number": "8882631875",
+      "salesperson_id": "971"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001401",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T14:03:52+00:00",
+    "basket_value_inr": 1113.0,
+    "metadata": {
+      "order_id": "104378732",
+      "customer_number": "1000000000",
+      "salesperson_id": "737"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001337",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T08:53:21+00:00",
+    "basket_value_inr": 225.0,
+    "metadata": {
+      "order_id": "104350137",
+      "customer_number": "9620836012",
+      "salesperson_id": "523"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001348",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T10:38:03+00:00",
+    "basket_value_inr": 799.0,
+    "metadata": {
+      "order_id": "104359750",
+      "customer_number": "9043344727",
+      "salesperson_id": "523"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001403",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T14:11:29+00:00",
+    "basket_value_inr": 1953.0,
+    "metadata": {
+      "order_id": "104379480",
+      "customer_number": "8280017709",
+      "salesperson_id": "1178"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001374",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T12:37:14+00:00",
+    "basket_value_inr": 693.0,
+    "metadata": {
+      "order_id": "104370397",
+      "customer_number": "9845021410",
+      "salesperson_id": "1178"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001347",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T10:20:44+00:00",
+    "basket_value_inr": 400.0,
+    "metadata": {
+      "order_id": "104358212",
+      "customer_number": "8105575833",
+      "salesperson_id": "971"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001346",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T10:16:39+00:00",
+    "basket_value_inr": 599.0,
+    "metadata": {
+      "order_id": "104357849",
+      "customer_number": "1000000000",
+      "salesperson_id": "1178"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001340",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T09:32:20+00:00",
+    "basket_value_inr": 814.98,
+    "metadata": {
+      "order_id": "104353598",
+      "customer_number": "7997037608",
+      "salesperson_id": "1190"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001366",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T12:14:44+00:00",
+    "basket_value_inr": 299.0,
+    "metadata": {
+      "order_id": "104368521",
+      "customer_number": "9961180216",
+      "salesperson_id": "971"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001438",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T15:46:15+00:00",
+    "basket_value_inr": 269.1,
+    "metadata": {
+      "order_id": "104389493",
+      "customer_number": "1000000000",
+      "salesperson_id": "523"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001443",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T16:09:55+00:00",
+    "basket_value_inr": 427.5,
+    "metadata": {
+      "order_id": "104391745",
+      "customer_number": "1000000000",
+      "salesperson_id": "523"
+    }
+  },
+  {
+    "transaction_id": "ML0426KAP0001372",
+    "store_id": "STORE_BLR_002",
+    "timestamp": "2026-04-10T12:30:18+00:00",
+    "basket_value_inr": 149.0,
+    "metadata": {
+      "order_id": "104369867",
+      "customer_number": "9716299932",
+      "salesperson_id": "523"
+    }
+  }
+]

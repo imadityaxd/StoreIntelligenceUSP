@@ -1,0 +1,3021 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Store Intelligence Live</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111315;
+      --panel: #181b1f;
+      --panel-2: #20242a;
+      --line: #343a43;
+      --text: #eef2f5;
+      --muted: #9ba7b4;
+      --blue: #56a4ff;
+      --green: #50d287;
+      --amber: #e7b451;
+      --red: #ef6b6b;
+      --violet: #a98bff;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: #262c33;
+      color: var(--text);
+      min-height: 38px;
+      padding: 0 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: #2f8355;
+      background: #276946;
+    }
+
+    button.danger {
+      border-color: #8c4242;
+      background: #622a2d;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    input, select {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #101215;
+      color: var(--text);
+      padding: 0 10px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .app {
+      min-height: 100%;
+      display: grid;
+      grid-template-rows: 58px 1fr;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--line);
+      background: #15181c;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .chips {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: var(--muted);
+      background: #101215;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .chip.good { color: var(--green); border-color: rgba(80, 210, 135, 0.35); }
+    .chip.warn { color: var(--amber); border-color: rgba(231, 180, 81, 0.35); }
+    .chip.bad { color: var(--red); border-color: rgba(239, 107, 107, 0.35); }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      background: #15181c;
+      padding: 14px;
+      overflow: auto;
+    }
+
+    main {
+      padding: 14px;
+      overflow: auto;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 12px 0;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .panel-body {
+      padding: 12px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .hidden-controls {
+      display: none !important;
+    }
+
+    .usp-title {
+      display: grid;
+      gap: 5px;
+    }
+
+    .usp-title strong {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .usp-title span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .source-card {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #111418;
+    }
+
+    .toggle-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .toggle-pill {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #111418;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .upload-help {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .source-mode {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .mode-button {
+      min-height: 42px;
+      padding: 0 8px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted);
+      background: #111418;
+    }
+
+    .mode-button.active {
+      color: var(--green);
+      border-color: rgba(80, 210, 135, 0.45);
+      background: rgba(80, 210, 135, 0.1);
+    }
+
+    button.primary.running {
+      border-color: rgba(231, 180, 81, 0.55);
+      background: #6b5121;
+      color: #ffe3a3;
+    }
+
+    button.danger.ready-stop {
+      opacity: 1;
+      border-color: rgba(239, 107, 107, 0.7);
+      background: #7b3034;
+      color: #fff;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .actions button,
+    .actions a {
+      flex: 1;
+    }
+
+    .button-link {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #262c33;
+      color: var(--text);
+      padding: 0 12px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .button-link.primary {
+      border-color: #2f8355;
+      background: #276946;
+    }
+
+    .button-link.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    details.panel {
+      overflow: hidden;
+    }
+
+    details.panel > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    details.panel > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.panel > summary::after {
+      content: "Open";
+      color: var(--blue);
+      font-size: 12px;
+      text-transform: none;
+      font-weight: 700;
+    }
+
+    details.panel[open] > summary {
+      border-bottom: 1px solid var(--line);
+    }
+
+    details.panel[open] > summary::after {
+      content: "Close";
+      color: var(--muted);
+    }
+
+    .camera-health {
+      display: grid;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101215;
+      padding: 10px;
+    }
+
+    .wizard-steps {
+      display: grid;
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101215;
+      padding: 10px;
+    }
+
+    .wizard-step {
+      display: grid;
+      grid-template-columns: 18px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .wizard-step .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #3a424c;
+      box-shadow: 0 0 0 3px rgba(154, 167, 180, 0.08);
+    }
+
+    .wizard-step.complete .step-dot,
+    .wizard-step.current .step-dot {
+      background: var(--green);
+      box-shadow: 0 0 0 3px rgba(80, 210, 135, 0.12);
+    }
+
+    .wizard-step.current {
+      color: var(--text);
+      font-weight: 750;
+    }
+
+    .wizard-step.warn .step-dot,
+    .wizard-step.pending .step-dot {
+      background: var(--amber);
+      box-shadow: 0 0 0 3px rgba(231, 180, 81, 0.12);
+    }
+
+    .wizard-step.failed .step-dot {
+      background: var(--red);
+      box-shadow: 0 0 0 3px rgba(239, 107, 107, 0.12);
+    }
+
+    .progress-track {
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid #242a31;
+      background: #0e1114;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      transition: width 180ms ease;
+    }
+
+    .calibration-stage {
+      display: grid;
+      gap: 8px;
+    }
+
+    .calibration-canvas-wrap {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #060708;
+      overflow: hidden;
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+    }
+
+    #calibrationCanvas {
+      width: 100%;
+      height: auto;
+      max-height: 320px;
+      display: block;
+      cursor: crosshair;
+    }
+
+    .compact-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .health-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .health-row strong {
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(80, 210, 135, 0.12);
+      flex: 0 0 auto;
+    }
+
+    .dot.warn { background: var(--amber); box-shadow: 0 0 0 4px rgba(231, 180, 81, 0.12); }
+    .dot.bad { background: var(--red); box-shadow: 0 0 0 4px rgba(239, 107, 107, 0.12); }
+
+    .status-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .camera-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px;
+      background: #101215;
+      display: grid;
+      gap: 7px;
+    }
+
+    .camera-card .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .camera-card strong {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 7px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .status-pill.good { color: var(--green); border-color: rgba(80, 210, 135, 0.35); }
+    .status-pill.warn { color: var(--amber); border-color: rgba(231, 180, 81, 0.35); }
+    .status-pill.bad { color: var(--red); border-color: rgba(239, 107, 107, 0.35); }
+
+    .intelligence-panel {
+      margin-top: 14px;
+    }
+
+    .intelligence-headline {
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #101215;
+      padding: 10px;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .insight-card {
+      min-height: 92px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #14171b;
+      padding: 10px;
+      display: grid;
+      align-content: start;
+      gap: 6px;
+    }
+
+    .insight-card span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .insight-card strong {
+      font-size: 20px;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .insight-card em {
+      color: var(--muted);
+      font-size: 12px;
+      font-style: normal;
+      line-height: 1.35;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(420px, 1.4fr) minmax(340px, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .video-shell {
+      background: #060708;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      min-height: 320px;
+      position: relative;
+    }
+
+    video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #050608;
+    }
+
+    .ai-overlay-canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .video-empty {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      pointer-events: none;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .video-overlay {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      z-index: 3;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .toggle-row input {
+      width: auto;
+      min-height: auto;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(110px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--panel);
+      min-height: 86px;
+    }
+
+    .metric .label {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .metric .value {
+      margin-top: 8px;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .metric .sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+      gap: 14px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 10px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 52px;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .track {
+      height: 9px;
+      border-radius: 999px;
+      background: #0e1114;
+      overflow: hidden;
+      border: 1px solid #242a31;
+    }
+
+    .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+    }
+
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 8px;
+    }
+
+    .zone {
+      min-height: 72px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 9px;
+      background: #14171b;
+    }
+
+    .zone strong {
+      display: block;
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .zone span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .events {
+      display: grid;
+      gap: 8px;
+      max-height: 410px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: minmax(138px, 0.55fr) minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #14171b;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    .event.clickable {
+      cursor: pointer;
+    }
+
+    .event.clickable:hover {
+      border-color: rgba(86, 164, 255, 0.55);
+      background: #18202a;
+    }
+
+    .event-type {
+      color: var(--blue);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .event-meta {
+      color: var(--muted);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    .error-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .error-item {
+      padding: 9px;
+      border-radius: 8px;
+      border: 1px solid rgba(239, 107, 107, 0.4);
+      color: #ffc6c6;
+      background: rgba(239, 107, 107, 0.08);
+      font-size: 12px;
+    }
+
+    @media (max-width: 1160px) {
+      .workspace { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); }
+      .layout, .split { grid-template-columns: 1fr; }
+      .insight-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .topbar { align-items: flex-start; height: auto; padding: 12px; flex-direction: column; }
+      .metrics { grid-template-columns: 1fr; }
+      .insight-grid { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 92px 1fr 42px; }
+      .event { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true"></div>
+        <h1>Store Intelligence Live</h1>
+      </div>
+      <div class="chips">
+        <span id="apiChip" class="chip warn">System checking</span>
+        <span id="sessionChip" class="chip">No active session</span>
+        <span id="qualityChip" class="chip">Data reliability pending</span>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="stack">
+        <section class="panel">
+          <div class="panel-header"><h2>CCTV Analysis</h2></div>
+          <div class="panel-body stack">
+            <div class="usp-title">
+              <strong>Analyze one CCTV run</strong>
+              <span>Pick a saved camera, upload a CCTV clip, or connect a live CCTV stream. The system will detect people, keep boxes on the video, create scoped events, and build the report.</span>
+            </div>
+
+            <div class="source-mode" role="group" aria-label="CCTV source type">
+              <button type="button" class="mode-button active" data-source-mode="saved">Saved Clip</button>
+              <button type="button" class="mode-button" data-source-mode="upload">Upload Video</button>
+              <button type="button" class="mode-button" data-source-mode="live">Live CCTV</button>
+            </div>
+
+            <div id="savedSourceBlock" class="field">
+              <label for="sourceSelect">Saved CCTV source</label>
+              <select id="sourceSelect"></select>
+            </div>
+
+            <div id="uploadSourceBlock" class="field" hidden>
+              <label for="guidedUploadFile">Upload CCTV video</label>
+              <input id="guidedUploadFile" type="file" accept="video/*">
+              <div class="upload-help">Use this for a CCTV recording not already listed above.</div>
+            </div>
+
+            <div id="liveSourceBlock" class="field" hidden>
+              <label for="liveRtspUrl">Live CCTV stream</label>
+              <input id="liveRtspUrl" placeholder="rtsp://user:password@camera-ip/stream">
+              <div class="upload-help">Connect a live camera stream and analyze it with the same person boxes and scoped event flow.</div>
+            </div>
+
+            <div class="source-card">
+              <div class="health-row"><span>Status</span><strong><span id="selectedCameraDot" class="dot warn"></span><span id="selectedCameraStatus">Waiting</span></strong></div>
+              <div class="health-row"><span>Tracker</span><strong id="trackingStatus">Auto profile</strong></div>
+              <div class="health-row"><span>Scope</span><strong id="analysisMode">Current CCTV run</strong></div>
+            </div>
+
+            <div class="toggle-pills">
+              <label class="toggle-pill" for="showAiOverlay">
+                <span>Person boxes</span>
+                <input id="showAiOverlay" type="checkbox" checked>
+              </label>
+              <label class="toggle-pill" for="showZoneOverlay">
+                <span>Zones</span>
+                <input id="showZoneOverlay" type="checkbox">
+              </label>
+            </div>
+
+            <div class="actions">
+              <button id="guidedUploadBtn" class="primary">Start Analysis</button>
+              <button id="stopBtn" class="danger" disabled>Stop</button>
+            </div>
+            <div id="guidedUploadStatus" class="tiny">Ready to analyze a saved CCTV source or uploaded video.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><h2>Run Result</h2><span id="sessionId" class="tiny">not started</span></div>
+          <div class="panel-body stack">
+            <div class="grid-2">
+              <div><div class="tiny">Status</div><strong id="sessionStatus">Idle</strong></div>
+              <div><div class="tiny">Events</div><strong id="sessionEvents">0</strong></div>
+            </div>
+            <div>
+              <div class="tiny">Source</div>
+              <strong id="sessionSource">No source</strong>
+            </div>
+            <div class="progress-track"><div id="sessionProgressFill" class="progress-fill"></div></div>
+            <div id="sessionProgressSteps" class="wizard-steps"></div>
+            <div class="source-card">
+              <div class="health-row"><span>Result</span><strong id="sessionResultStatus">Waiting</strong></div>
+              <div class="health-row"><span>Mode</span><strong id="sessionModeLabel">--</strong></div>
+              <div class="tiny" id="sessionResultNote">Start a CCTV analysis to generate scoped results.</div>
+            </div>
+            <div class="actions" id="sessionReportActions">
+              <a id="downloadReportMd" class="button-link primary disabled" href="#" download>Report</a>
+              <a id="downloadReportCsv" class="button-link disabled" href="#" download>CSV</a>
+              <a id="downloadReportJson" class="button-link disabled" href="#" download>JSON</a>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <main>
+        <div class="layout">
+          <section>
+            <div class="video-shell">
+              <video id="video" controls muted playsinline></video>
+              <canvas id="aiOverlayCanvas" class="ai-overlay-canvas" aria-hidden="true"></canvas>
+              <div id="videoEmpty" class="video-empty">Select a source or upload a video</div>
+              <div class="video-overlay">
+                <span id="sourceChip" class="chip">No source</span>
+                <span id="stageChip" class="chip">Idle</span>
+                <span id="overlayChip" class="chip">AI overlay waiting</span>
+              </div>
+            </div>
+
+            <div class="metrics">
+              <div class="metric"><div class="label">Valid People</div><div id="visitors" class="value">0</div><div class="sub">countable tracks</div></div>
+              <div class="metric"><div class="label">Events</div><div id="eventsTotal" class="value">0</div><div class="sub">stored live</div></div>
+              <div class="metric"><div class="label">Queue</div><div id="queueDepth" class="value">0</div><div class="sub">latest depth</div></div>
+              <div class="metric"><div class="label">Conversion</div><div id="conversion" class="value">0%</div><div id="conversionSub" class="sub">POS matched</div></div>
+              <div class="metric"><div class="label">Abandon</div><div id="abandon" class="value">0%</div><div class="sub">queue loss</div></div>
+            </div>
+
+            <section class="panel intelligence-panel">
+              <div class="panel-header"><h2>Live Intelligence</h2><span id="intelligenceScope" class="tiny">waiting</span></div>
+              <div class="panel-body stack">
+                <div id="intelligenceHeadline" class="intelligence-headline">Start analysis to turn CCTV into valid person movement, zone engagement, and queue intelligence.</div>
+                <div class="insight-grid">
+                  <div class="insight-card">
+                    <span>Person movement</span>
+                    <strong id="movementInsight">--</strong>
+                    <em id="movementDetail">No valid person tracks yet.</em>
+                  </div>
+                  <div class="insight-card">
+                    <span>Top zone</span>
+                    <strong id="zoneInsight">--</strong>
+                    <em id="zoneDetail">No zone engagement yet.</em>
+                  </div>
+                  <div class="insight-card">
+                    <span>Queue pressure</span>
+                    <strong id="queueInsight">--</strong>
+                    <em id="queueDetail">Billing queue not observed yet.</em>
+                  </div>
+                  <div class="insight-card">
+                    <span>Conversion signal</span>
+                    <strong id="conversionInsight">--</strong>
+                    <em id="conversionDetail">Waiting for billing or POS signal.</em>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <div class="split">
+              <section class="panel">
+                <div class="panel-header"><h2>Funnel</h2><span id="storeLabel" class="tiny">--</span></div>
+                <div class="panel-body stack">
+                  <div id="funnelInsight" class="tiny">Start monitoring to build the person journey.</div>
+                  <div id="funnel" class="bars"><div class="tiny">Start monitoring to build the funnel.</div></div>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-header"><h2>Heatmap</h2><span id="heatmapLabel" class="tiny">--</span></div>
+                <div class="panel-body stack">
+                  <div id="heatmapInsightSummary" class="tiny">Start monitoring to find the strongest zone.</div>
+                  <div id="heatmap" class="heatmap"><div class="tiny">Start monitoring to populate zone activity.</div></div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <section class="stack">
+            <section class="panel">
+              <div class="panel-header"><h2>Alerts</h2></div>
+              <div class="panel-body"><div id="alerts" class="error-list"><div class="tiny">No active alerts</div></div></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-header"><h2>Event Feed</h2><span class="tiny">current session</span></div>
+              <div class="panel-body"><div id="eventFeed" class="events"><div class="tiny">Start monitoring to see live events.</div></div></div>
+            </section>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="hidden-controls" aria-hidden="true">
+      <button id="startBtn" type="button"></button>
+      <input id="guidedSessionLabel" value="">
+      <div id="guidedSteps"></div>
+      <select id="guidedStoreId"><option value="STORE_BLR_002">STORE_BLR_002</option></select>
+      <select id="guidedCameraId">
+        <option value="CAM_1">CAM_1</option>
+        <option value="CAM_2">CAM_2</option>
+        <option value="CAM_3">CAM_3</option>
+        <option value="CAM_4">CAM_4</option>
+        <option value="CAM_5">CAM_5</option>
+      </select>
+      <select id="guidedCameraRole">
+        <option value="zone">Zone</option>
+        <option value="entry">Entry</option>
+        <option value="billing">Billing</option>
+        <option value="staff-area">Staff area</option>
+        <option value="detection_only">Detection only</option>
+      </select>
+      <select id="guidedAnalysisMode">
+        <option value="full_store">Full store</option>
+        <option value="detection_only">Detection only</option>
+        <option value="entry_exit">Entry/exit</option>
+        <option value="zone">Zone</option>
+        <option value="billing">Billing</option>
+      </select>
+      <strong id="guidedLayoutStatus">Checking</strong>
+      <strong id="guidedEffectiveMode">Full store</strong>
+      <div id="guidedReadinessNote">Choose a video to begin.</div>
+      <div id="sessionScope">Current run</div>
+      <div id="historySummary"></div>
+      <div id="sessionHistoryList"></div>
+      <button id="refreshSessionsBtn" type="button"></button>
+      <strong id="opsSummary">--</strong>
+      <strong id="liveQuality">--</strong>
+      <strong id="lowConfidence">--</strong>
+      <div id="cameraHealthList"></div>
+      <div id="searchStoreLabel"></div>
+      <select id="eventTypeFilter"><option value="">Any</option></select>
+      <input id="cameraFilter">
+      <input id="visitorFilter">
+      <select id="confidenceFilter"><option value="">Any</option></select>
+      <button id="searchBtn" type="button"></button>
+      <div id="searchResults"></div>
+      <input id="posUploadFile" type="file" accept=".csv,text/csv">
+      <button id="posPreviewBtn" type="button"></button>
+      <button id="posImportBtn" type="button"></button>
+      <input id="posTxnColumn">
+      <input id="posAmountColumn">
+      <input id="posTimestampColumn">
+      <input id="posTimezoneOffset" value="+05:30">
+      <input id="posDateColumn">
+      <input id="posTimeColumn">
+      <input id="posStoreColumn">
+      <strong id="posImportStatus">No POS uploaded</strong>
+      <strong id="posMatchStatus">--</strong>
+      <div id="posMatchNote"></div>
+      <div id="posPreviewList"></div>
+      <button id="markStaffBtn" type="button"></button>
+      <button id="markCustomerBtn" type="button"></button>
+      <div id="staffCorrectionStatus"></div>
+      <div id="timelineVisitorLabel"></div>
+      <div id="visitorTimeline"></div>
+      <input id="cameraId" value="CAM_1">
+      <input id="uploadFile" type="file" accept="video/*">
+      <button id="uploadBtn" type="button"></button>
+      <input id="rtspUrl">
+      <button id="rtspBtn" type="button"></button>
+      <input id="maxSeconds" type="number" value="180">
+      <input id="processFps" type="number" value="3">
+      <input id="replaySpeed" type="number" value="8">
+      <input id="minArea" type="number" value="1300">
+      <select id="trackerBackend">
+        <option value="auto" selected>Auto profile</option>
+        <option value="bytetrack">ByteTrack</option>
+        <option value="botsort">BoT-SORT</option>
+        <option value="centroid">Centroid fallback</option>
+      </select>
+      <input id="yoloConf" type="number" value="0.40">
+      <input id="yoloIou" type="number" value="0.28">
+      <input id="calibrationTimestamp" type="number" value="10">
+      <select id="calibrationMode"><option value="polygon">Zone polygon</option><option value="entry_line">Entry line</option></select>
+      <button id="extractCalibrationFrameBtn" type="button"></button>
+      <canvas id="calibrationCanvas"></canvas>
+      <div id="calibrationEmpty"></div>
+      <button id="undoCalibrationPointBtn" type="button"></button>
+      <button id="clearCalibrationPointsBtn" type="button"></button>
+      <button id="addCalibrationZoneBtn" type="button"></button>
+      <input id="calibrationZoneId" value="ZONE_NEW">
+      <input id="calibrationZoneLabel" value="New Zone">
+      <select id="calibrationZoneKind"><option value="product_zone">Product zone</option></select>
+      <input id="calibrationSkuZone">
+      <button id="saveCalibrationBtn" type="button"></button>
+      <div id="calibrationStatus"></div>
+      <div id="calibrationZoneList"></div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      sources: [],
+      stores: [],
+      sessions: [],
+      currentStoreId: "STORE_BLR_002",
+      latestSnapshot: null,
+      activeSession: null,
+      sourceMode: "saved",
+      eventSource: null,
+      fallbackSource: null,
+      previewStartedFor: null,
+      localPreviewUrl: null,
+      overlaySessionId: null,
+      overlayFrames: [],
+      overlayGeometry: {zones: [], entry_line_normalized: null},
+      overlayFrameWidth: null,
+      overlayFrameHeight: null,
+      overlaySampleInterval: 0.7,
+      overlayLastAttempt: 0,
+      overlayReady: false,
+      overlayFirstSecond: null,
+      overlayLastSecond: null,
+      overlaySummaryLabel: "AI overlay waiting",
+      overlayCurrentChip: "",
+      overlayAnimation: null,
+      onboardingValidation: null,
+      calibration: {
+        reference: null,
+        image: null,
+        points: [],
+        zones: [],
+        entryLine: null,
+        versions: []
+      },
+      selectedVisitorId: null,
+      posPreview: null,
+      posMatches: null
+    };
+
+    const ANALYSIS_MODE_LABELS = {
+      full_store: "Full store",
+      detection_only: "Detection only",
+      entry_exit: "Entry/exit",
+      zone: "Zone",
+      billing: "Billing queue"
+    };
+
+    const GUIDED_STEPS = [
+      ["video", "Video selected"],
+      ["store", "Store selected"],
+      ["camera", "Camera mapped"],
+      ["layout", "Layout checked"],
+      ["ready", "Ready to analyze"]
+    ];
+
+    const $ = (id) => document.getElementById(id);
+
+    function isSessionRunning(session = state.activeSession) {
+      const status = session && session.status;
+      return ["queued", "processing", "replaying"].includes(status || "");
+    }
+
+    function hasRunnableSource() {
+      if (state.sourceMode === "saved") return Boolean(selectedSource());
+      if (state.sourceMode === "upload") return Boolean($("guidedUploadFile")?.files?.[0]);
+      if (state.sourceMode === "live") return Boolean(($("liveRtspUrl")?.value || "").trim());
+      return false;
+    }
+
+    function canStartAnalysis() {
+      return hasRunnableSource() && Boolean($("guidedStoreId")?.value) && Boolean($("guidedCameraId")?.value);
+    }
+
+    function updateRunControls(session = state.activeSession) {
+      const running = isSessionRunning(session);
+      const start = $("guidedUploadBtn");
+      const stop = $("stopBtn");
+      if (!start || !stop) return;
+      start.disabled = running || !canStartAnalysis();
+      start.textContent = running ? "Analyzing..." : "Start Analysis";
+      start.classList.toggle("running", running);
+      stop.disabled = !running;
+      stop.classList.toggle("ready-stop", running);
+    }
+
+    function fmt(value, fallback = "0") {
+      return value === undefined || value === null || Number.isNaN(value) ? fallback : String(value);
+    }
+
+    function formatClock(seconds) {
+      const safe = Math.max(0, Number(seconds || 0));
+      const mins = Math.floor(safe / 60);
+      const secs = Math.floor(safe % 60);
+      return `${mins}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function statusTone(status) {
+      if (["ONLINE", "OK", "complete", "ready"].includes(status)) return "good";
+      if (["DEGRADED", "STALE", "processing", "replaying", "queued"].includes(status)) return "warn";
+      if (["NO_EVENTS", "ERROR", "error", "failed"].includes(status)) return "bad";
+      return "";
+    }
+
+    function modeLabel(mode) {
+      return ANALYSIS_MODE_LABELS[mode] || mode || "--";
+    }
+
+    function renderStepList(containerId, steps) {
+      const container = $(containerId);
+      if (!container) return;
+      container.innerHTML = (steps || []).map((step) => `
+        <div class="wizard-step ${step.status || "pending"}">
+          <span class="step-dot" aria-hidden="true"></span>
+          <span>${step.label}</span>
+          <span class="tiny">${step.detail || step.status || ""}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderGuidedSteps() {
+      const hasVideo = Boolean($("guidedUploadFile").files[0]);
+      const hasSavedSource = Boolean(selectedSource());
+      const hasLiveSource = Boolean(($("liveRtspUrl")?.value || "").trim());
+      const hasRunnableSourceNow = hasRunnableSource();
+      const storeId = $("guidedStoreId").value;
+      const cameraId = $("guidedCameraId").value;
+      const validation = state.onboardingValidation;
+      const readiness = validation && validation.layout_readiness;
+      const steps = GUIDED_STEPS.map(([key, label]) => {
+        if (key === "video") return {label, status: hasRunnableSourceNow ? "complete" : "pending", detail: state.sourceMode === "live" ? (hasLiveSource ? "live stream" : "needed") : hasVideo ? "uploaded" : hasSavedSource ? "saved source" : "needed"};
+        if (key === "store") return {label, status: storeId ? "complete" : "pending", detail: storeId || "needed"};
+        if (key === "camera") return {label, status: cameraId ? "complete" : "pending", detail: cameraId || "needed"};
+        if (key === "layout") {
+          const mode = readiness && readiness.effective_analysis_mode;
+          const status = !readiness ? "pending" : readiness.status === "ready" ? "complete" : "warn";
+          return {label, status, detail: mode ? modeLabel(mode) : "checking"};
+        }
+        const ready = hasRunnableSourceNow && storeId && cameraId;
+        return {label, status: ready ? "complete" : "pending", detail: ready ? "start" : "waiting"};
+      });
+      renderStepList("guidedSteps", steps);
+      updateRunControls();
+    }
+
+    function setCalibrationStatus(text, tone = "") {
+      const el = $("calibrationStatus");
+      el.textContent = text;
+      el.style.color = tone === "bad" ? "var(--red)" : tone === "good" ? "var(--green)" : tone === "warn" ? "var(--amber)" : "var(--muted)";
+    }
+
+    function calibrationContext() {
+      const source = selectedSource();
+      return {
+        source,
+        storeId: $("guidedStoreId").value || (source && source.store_id) || activeStoreId(),
+        cameraId: $("guidedCameraId").value || (source && source.camera_id) || "CAM_1",
+        role: $("guidedCameraRole").value || (source && source.role) || "zone",
+        layoutPath: source && source.layout_path
+      };
+    }
+
+    function normalizedClickPoint(event, canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      return [Math.max(0, Math.min(1, Number(x.toFixed(6)))), Math.max(0, Math.min(1, Number(y.toFixed(6))))];
+    }
+
+    function drawCalibrationCanvas() {
+      const canvas = $("calibrationCanvas");
+      const ctx = canvas.getContext("2d");
+      const image = state.calibration.image;
+      if (!image) {
+        canvas.width = 1;
+        canvas.height = 1;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      canvas.width = image.naturalWidth || 1280;
+      canvas.height = image.naturalHeight || 720;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      const drawPoint = (point, color, label) => {
+        const x = point[0] * canvas.width;
+        const y = point[1] * canvas.height;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        if (label) {
+          ctx.fillStyle = "rgba(6, 7, 8, 0.8)";
+          ctx.fillRect(x + 8, y - 18, 72, 18);
+          ctx.fillStyle = color;
+          ctx.font = "13px sans-serif";
+          ctx.fillText(label, x + 12, y - 5);
+        }
+      };
+
+      const drawPolygon = (points, stroke, fill, label) => {
+        if (!points || points.length < 2) return;
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          const x = point[0] * canvas.width;
+          const y = point[1] * canvas.height;
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        if (points.length >= 3) ctx.closePath();
+        ctx.fillStyle = fill;
+        if (points.length >= 3) ctx.fill();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        points.forEach((point, index) => drawPoint(point, stroke, String(index + 1)));
+        if (label && points[0]) drawPoint(points[0], stroke, label);
+      };
+
+      for (const zone of state.calibration.zones) {
+        drawPolygon(zone.polygon_normalized, "#56a4ff", "rgba(86,164,255,0.18)", zone.zone_id);
+      }
+      if (state.calibration.entryLine && state.calibration.entryLine.length === 2) {
+        drawPolygon(state.calibration.entryLine, "#e7b451", "rgba(231,180,81,0.05)", "ENTRY");
+      }
+      drawPolygon(state.calibration.points, "#50d287", "rgba(80,210,135,0.16)", "new");
+    }
+
+    function renderCalibrationZoneList() {
+      const zones = state.calibration.zones || [];
+      const entryLine = state.calibration.entryLine;
+      const rows = zones.map((zone) => `
+        <div class="camera-card">
+          <div class="top">
+            <strong>${zone.zone_id}</strong>
+            <span class="status-pill good">${zone.kind}</span>
+          </div>
+          <div class="tiny">${zone.label} - ${zone.polygon_normalized.length} points</div>
+        </div>
+      `);
+      if (entryLine) {
+        rows.push(`
+          <div class="camera-card">
+            <div class="top">
+              <strong>Entry line</strong>
+              <span class="status-pill warn">line</span>
+            </div>
+            <div class="tiny">2 points</div>
+          </div>
+        `);
+      }
+      $("calibrationZoneList").innerHTML = rows.join("") || `<div class="tiny">No drawn zones yet</div>`;
+    }
+
+    async function loadCalibrationVersions() {
+      const context = calibrationContext();
+      const params = new URLSearchParams({store_id: context.storeId, camera_id: context.cameraId});
+      const response = await fetch(`/dashboard/calibrations?${params.toString()}`);
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      state.calibration.versions = payload.versions || [];
+      if (payload.latest) {
+        setCalibrationStatus(`Latest calibration: ${payload.latest.version_id}`, "good");
+      } else if (!state.calibration.reference) {
+        setCalibrationStatus("No calibration saved for this camera", "warn");
+      }
+    }
+
+    async function extractCalibrationFrame() {
+      const context = calibrationContext();
+      const body = {
+        source_id: context.source && context.source.source_id,
+        store_id: context.storeId,
+        camera_id: context.cameraId,
+        camera_role: context.role,
+        timestamp_seconds: Number($("calibrationTimestamp").value || 10)
+      };
+      if (!body.source_id && context.source && context.source.video_path) {
+        body.video_path = context.source.video_path;
+      }
+      if (!body.source_id && !body.video_path) {
+        throw new Error("Select a saved/uploaded video source before extracting a frame.");
+      }
+      setCalibrationStatus("Extracting reference frame...", "warn");
+      const response = await fetch("/dashboard/calibration/reference-frame", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+      });
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      state.calibration.reference = payload;
+      state.calibration.points = [];
+      state.calibration.zones = [];
+      state.calibration.entryLine = null;
+      const image = new Image();
+      image.onload = () => {
+        state.calibration.image = image;
+        $("calibrationEmpty").style.display = "none";
+        drawCalibrationCanvas();
+        renderCalibrationZoneList();
+        setCalibrationStatus(`Frame ready at ${formatClock(payload.timestamp_seconds)}`, "good");
+      };
+      image.src = payload.reference_frame_url;
+    }
+
+    function addCalibrationPoint(event) {
+      if (!state.calibration.image) return;
+      const mode = $("calibrationMode").value;
+      const point = normalizedClickPoint(event, $("calibrationCanvas"));
+      state.calibration.points.push(point);
+      if (mode === "entry_line" && state.calibration.points.length > 2) {
+        state.calibration.points = state.calibration.points.slice(-2);
+      }
+      drawCalibrationCanvas();
+    }
+
+    function addCalibrationZone() {
+      const mode = $("calibrationMode").value;
+      const points = state.calibration.points.slice();
+      if (mode === "entry_line") {
+        if (points.length !== 2) {
+          setCalibrationStatus("Entry line needs exactly 2 points", "warn");
+          return;
+        }
+        state.calibration.entryLine = points;
+      } else {
+        if (points.length < 3) {
+          setCalibrationStatus("Zone polygon needs at least 3 points", "warn");
+          return;
+        }
+        const zoneId = $("calibrationZoneId").value.trim().toUpperCase().replaceAll(" ", "_") || "ZONE_NEW";
+        state.calibration.zones = state.calibration.zones.filter((zone) => zone.zone_id !== zoneId);
+        state.calibration.zones.push({
+          zone_id: zoneId,
+          label: $("calibrationZoneLabel").value.trim() || zoneId,
+          kind: $("calibrationZoneKind").value || "product_zone",
+          sku_zone: $("calibrationSkuZone").value.trim() || null,
+          polygon_normalized: points
+        });
+      }
+      state.calibration.points = [];
+      drawCalibrationCanvas();
+      renderCalibrationZoneList();
+      setCalibrationStatus("Drawing added. Save calibration to use it in analysis.", "good");
+    }
+
+    async function saveCalibration() {
+      const context = calibrationContext();
+      if (!state.calibration.reference) {
+        throw new Error("Extract a reference frame first.");
+      }
+      if (!state.calibration.zones.length && !state.calibration.entryLine) {
+        throw new Error("Draw at least one zone polygon or entry line first.");
+      }
+      setCalibrationStatus("Saving calibration version...", "warn");
+      const body = {
+        store_id: context.storeId,
+        camera_id: context.cameraId,
+        camera_role: context.role,
+        source_id: context.source && context.source.source_id,
+        source_label: context.source && context.source.label,
+        reference_frame_path: state.calibration.reference.reference_frame_path,
+        base_layout_path: context.layoutPath,
+        zones: state.calibration.zones,
+        entry_line_normalized: state.calibration.entryLine,
+        notes: "Saved from dashboard visual calibration"
+      };
+      const response = await fetch("/dashboard/calibration/save", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+      });
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      setCalibrationStatus(`Saved ${payload.version.version_id}`, "good");
+      await loadCalibrationVersions();
+      await refreshGuidedValidation();
+    }
+
+    function dotClass(status) {
+      const tone = statusTone(status);
+      return `dot ${tone === "bad" ? "bad" : tone === "warn" ? "warn" : ""}`.trim();
+    }
+
+    function activeStoreId() {
+      return state.currentStoreId || (selectedSource() && selectedSource().store_id) || "STORE_BLR_002";
+    }
+
+    async function refreshSnapshot() {
+      const storeId = activeStoreId();
+      const params = new URLSearchParams();
+      if (state.activeSession && state.activeSession.session_id) {
+        params.set("session_id", state.activeSession.session_id);
+      }
+      const suffix = params.toString() ? `?${params.toString()}` : "";
+      const response = await fetch(`/dashboard/stores/${encodeURIComponent(storeId)}/snapshot${suffix}`);
+      if (!response.ok) throw new Error(await response.text());
+      renderPayload({session: state.activeSession, snapshot: await response.json()});
+    }
+
+    function renderSessionHistory() {
+      const sessions = state.sessions || [];
+      const container = $("sessionHistoryList");
+      if (!container) return;
+      $("historySummary").textContent = sessions.length ? `${sessions.length} recent` : "recent runs";
+      if (!sessions.length) {
+        container.innerHTML = '<div class="tiny">No previous sessions loaded.</div>';
+        return;
+      }
+      container.innerHTML = sessions.slice(0, 8).map((session) => {
+        const id = session.session_id || "";
+        const status = session.status || "unknown";
+        const label = session.session_label || (session.source && session.source.label) || session.source_label || id;
+        const camera = session.camera_id || (session.source && session.source.camera_id) || "--";
+        const events = session.inserted_events ?? session.generated_events ?? session.event_count ?? 0;
+        return `
+          <div class="camera-card">
+            <div class="top">
+              <strong>${label}</strong>
+              <span class="status-pill ${statusTone(status)}">${status}</span>
+            </div>
+            <div class="tiny">${camera} - ${fmt(events)} events - ${id}</div>
+            <div class="actions">
+              <button data-open-session-id="${id}">Open</button>
+              <a class="button-link" href="/dashboard/sessions/${encodeURIComponent(id)}/report?format=md" download>Report</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadSessions() {
+      const response = await fetch("/dashboard/sessions");
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      state.sessions = payload.sessions || [];
+      renderSessionHistory();
+    }
+
+    async function openHistoricalSession(sessionId) {
+      if (!sessionId) return;
+      if (state.eventSource) {
+        state.eventSource.close();
+        state.eventSource = null;
+      }
+      const response = await fetch(`/dashboard/sessions/${encodeURIComponent(sessionId)}/result`);
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      renderPayload({session: payload.session, snapshot: payload.snapshot});
+      setChip("sessionChip", "History loaded", "good");
+    }
+
+    function roleDefaultCamera(role) {
+      if (role === "entry") return "CAM_3";
+      if (role === "billing") return "CAM_5";
+      if (role === "staff-area") return "CAM_4";
+      return "CAM_1";
+    }
+
+    function populateStoreSelect() {
+      const select = $("guidedStoreId");
+      const storeIds = [...new Set((state.stores || []).map((store) => store.store_id).filter(Boolean))];
+      if (!storeIds.includes("STORE_BLR_002")) storeIds.unshift("STORE_BLR_002");
+      select.innerHTML = "";
+      for (const storeId of storeIds) {
+        const option = document.createElement("option");
+        option.value = storeId;
+        option.textContent = storeId;
+        select.appendChild(option);
+      }
+      select.value = storeIds.includes(state.currentStoreId) ? state.currentStoreId : storeIds[0];
+    }
+
+    function selectedStoreProfile() {
+      const storeId = $("guidedStoreId").value || state.currentStoreId;
+      return (state.stores || []).find((store) => store.store_id === storeId) || null;
+    }
+
+    function populateGuidedCameraSelect() {
+      const select = $("guidedCameraId");
+      const current = select.value;
+      const profile = selectedStoreProfile();
+      const cameras = (profile && profile.cameras && profile.cameras.length)
+        ? profile.cameras
+        : [
+            {camera_id: "CAM_1", role: "zone"},
+            {camera_id: "CAM_2", role: "zone"},
+            {camera_id: "CAM_3", role: "entry"},
+            {camera_id: "CAM_4", role: "staff-area"},
+            {camera_id: "CAM_5", role: "billing"}
+          ];
+      select.innerHTML = "";
+      for (const camera of cameras) {
+        const option = document.createElement("option");
+        option.value = camera.camera_id;
+        option.textContent = `${camera.camera_id}${camera.role ? ` - ${camera.role}` : ""}`;
+        option.dataset.role = camera.role || "zone";
+        select.appendChild(option);
+      }
+      const values = cameras.map((camera) => camera.camera_id);
+      select.value = values.includes(current) ? current : values[0];
+      syncGuidedRoleFromCamera();
+    }
+
+    function syncGuidedRoleFromCamera() {
+      const option = $("guidedCameraId").selectedOptions[0];
+      if (option && option.dataset.role) {
+        const role = option.dataset.role;
+        $("guidedCameraRole").value = role === "staff-area" ? "zone" : role;
+      }
+    }
+
+    function setChip(id, text, tone = "") {
+      const el = $(id);
+      el.className = `chip ${tone}`.trim();
+      el.textContent = text;
+    }
+
+    function setOverlayChip(text, tone = "") {
+      const key = `${tone}:${text}`;
+      if (state.overlayCurrentChip === key) return;
+      state.overlayCurrentChip = key;
+      setChip("overlayChip", text, tone);
+    }
+
+    function resetOverlayState(message = "AI overlay waiting", tone = "") {
+      state.overlaySessionId = null;
+      state.overlayFrames = [];
+      state.overlayGeometry = {zones: [], entry_line_normalized: null};
+      state.overlayFrameWidth = null;
+      state.overlayFrameHeight = null;
+      state.overlaySampleInterval = 0.7;
+      state.overlayLastAttempt = 0;
+      state.overlayReady = false;
+      state.overlayFirstSecond = null;
+      state.overlayLastSecond = null;
+      state.overlaySummaryLabel = message;
+      state.overlayCurrentChip = "";
+      setOverlayChip(message, tone);
+      drawVideoOverlay();
+    }
+
+    function resizeOverlayCanvas() {
+      const video = $("video");
+      const canvas = $("aiOverlayCanvas");
+      const rect = video.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      const width = Math.max(1, Math.round(rect.width * ratio));
+      const height = Math.max(1, Math.round(rect.height * ratio));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+    }
+
+    function videoDrawArea() {
+      const video = $("video");
+      const canvas = $("aiOverlayCanvas");
+      const ratio = window.devicePixelRatio || 1;
+      const cssWidth = canvas.width / ratio;
+      const cssHeight = canvas.height / ratio;
+      const sourceWidth = state.overlayFrameWidth || video.videoWidth || 16;
+      const sourceHeight = state.overlayFrameHeight || video.videoHeight || 9;
+      const scale = Math.min(cssWidth / sourceWidth, cssHeight / sourceHeight);
+      const width = sourceWidth * scale;
+      const height = sourceHeight * scale;
+      return {
+        x: (cssWidth - width) / 2,
+        y: (cssHeight - height) / 2,
+        width,
+        height,
+        ratio
+      };
+    }
+
+    function mapOverlayPoint(point, area) {
+      return {
+        x: (area.x + point[0] * area.width) * area.ratio,
+        y: (area.y + point[1] * area.height) * area.ratio
+      };
+    }
+
+    function frameForVideoTime(seconds) {
+      const frames = state.overlayFrames || [];
+      if (!frames.length) return null;
+      let low = 0;
+      let high = frames.length - 1;
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const value = Number(frames[mid].video_time_seconds || 0);
+        if (value < seconds) low = mid + 1;
+        else high = mid - 1;
+      }
+      const candidates = [frames[Math.max(0, high)], frames[Math.min(frames.length - 1, low)]].filter(Boolean);
+      let best = candidates[0];
+      for (const candidate of candidates) {
+        if (Math.abs(Number(candidate.video_time_seconds || 0) - seconds) < Math.abs(Number(best.video_time_seconds || 0) - seconds)) {
+          best = candidate;
+        }
+      }
+      const tolerance = Math.max(0.55, (state.overlaySampleInterval || 0.7) * 1.8);
+      return Math.abs(Number(best.video_time_seconds || 0) - seconds) <= tolerance ? best : null;
+    }
+
+    function syncVideoToOverlayCoverage() {
+      const video = $("video");
+      const status = state.activeSession && state.activeSession.status;
+      const detectionStillBuilding = ["queued", "processing"].includes(status || "");
+      if (!detectionStillBuilding || !state.overlayReady || state.overlayLastSecond === null) return false;
+      const tolerance = Math.max(0.75, (state.overlaySampleInterval || 0.7) * 1.8);
+      if ((video.currentTime || 0) <= state.overlayLastSecond + tolerance) return false;
+
+      const holdAt = Math.max(
+        state.overlayFirstSecond || 0,
+        state.overlayLastSecond - Math.min(0.25, state.overlaySampleInterval || 0.7)
+      );
+      video.currentTime = holdAt;
+      video.pause();
+      setOverlayChip(`Waiting for detection at ${formatClock(state.overlayLastSecond)}`, "warn");
+      return true;
+    }
+
+    function updateOverlayPlaybackChip(frame) {
+      if (!state.overlayReady) return;
+      const seconds = $("video").currentTime || 0;
+      const tolerance = Math.max(0.75, (state.overlaySampleInterval || 0.7) * 1.8);
+      if (state.overlayFirstSecond !== null && seconds < state.overlayFirstSecond - tolerance) {
+        setOverlayChip(`Overlay starts at ${formatClock(state.overlayFirstSecond)}`, "warn");
+        return;
+      }
+      if (state.overlayLastSecond !== null && seconds > state.overlayLastSecond + tolerance) {
+        if (syncVideoToOverlayCoverage()) return;
+        setOverlayChip(`Analysis window ended at ${formatClock(state.overlayLastSecond)}`, "warn");
+        return;
+      }
+      if (!frame && state.overlayFrames.length) {
+        setOverlayChip("Between detection samples", "warn");
+        return;
+      }
+      setOverlayChip(state.overlaySummaryLabel, "good");
+    }
+
+    function drawZones(ctx, area) {
+      if (!$("showZoneOverlay").checked) return;
+      const zones = (state.overlayGeometry && state.overlayGeometry.zones) || [];
+      ctx.save();
+      ctx.lineWidth = Math.max(1.5, 1.5 * area.ratio);
+      ctx.font = `${Math.max(11, 11 * area.ratio)}px sans-serif`;
+      for (const zone of zones) {
+        const points = zone.polygon_normalized || [];
+        if (points.length < 3) continue;
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          const mapped = mapOverlayPoint(point, area);
+          if (index === 0) ctx.moveTo(mapped.x, mapped.y);
+          else ctx.lineTo(mapped.x, mapped.y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = "rgba(86, 164, 255, 0.08)";
+        ctx.strokeStyle = "rgba(86, 164, 255, 0.7)";
+        ctx.fill();
+        ctx.stroke();
+        const labelPoint = mapOverlayPoint(points[0], area);
+        ctx.fillStyle = "rgba(6, 7, 8, 0.75)";
+        ctx.fillRect(labelPoint.x, labelPoint.y, Math.min(170 * area.ratio, (zone.label || zone.zone_id).length * 7.5 * area.ratio), 18 * area.ratio);
+        ctx.fillStyle = "#cfe6ff";
+        ctx.fillText(zone.label || zone.zone_id, labelPoint.x + 4 * area.ratio, labelPoint.y + 13 * area.ratio);
+      }
+      ctx.restore();
+    }
+
+    function drawTracks(ctx, area, frame) {
+      if (!$("showAiOverlay").checked || !frame) return;
+      ctx.save();
+      ctx.lineWidth = Math.max(2, 2 * area.ratio);
+      ctx.font = `${Math.max(12, 12 * area.ratio)}px sans-serif`;
+      for (const track of frame.tracks || []) {
+        const bbox = track.bbox_normalized;
+        if (!bbox || bbox.length !== 4) continue;
+        const topLeft = mapOverlayPoint([bbox[0], bbox[1]], area);
+        const bottomRight = mapOverlayPoint([bbox[2], bbox[3]], area);
+        const x = topLeft.x;
+        const y = topLeft.y;
+        const width = bottomRight.x - topLeft.x;
+        const height = bottomRight.y - topLeft.y;
+        const countable = track.countable !== false;
+        const color = countable ? "#50d287" : "#ef6b6b";
+        const label = track.label || track.visitor_id || `P${track.track_id}`;
+        const predicted = (track.track_status === "predicted") || Number(track.missed || 0) > 0;
+        ctx.strokeStyle = color;
+        ctx.globalAlpha = countable ? (predicted ? 0.62 : 1) : 0.72;
+        if (predicted) ctx.setLineDash([6 * area.ratio, 4 * area.ratio]);
+        ctx.strokeRect(x, y, width, height);
+        ctx.setLineDash([]);
+        const labelWidth = Math.min(260 * area.ratio, Math.max(72 * area.ratio, label.length * 7.2 * area.ratio));
+        const labelY = Math.max(0, y - 21 * area.ratio);
+        ctx.fillStyle = "rgba(6, 7, 8, 0.82)";
+        ctx.fillRect(x, labelY, labelWidth, 20 * area.ratio);
+        ctx.fillStyle = color;
+        ctx.fillText(label, x + 5 * area.ratio, labelY + 14 * area.ratio);
+        ctx.globalAlpha = 1;
+      }
+      ctx.restore();
+    }
+
+    function drawVideoOverlay() {
+      const canvas = $("aiOverlayCanvas");
+      if (!canvas) return;
+      resizeOverlayCanvas();
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const area = videoDrawArea();
+      const frame = frameForVideoTime($("video").currentTime || 0);
+      drawZones(ctx, area);
+      drawTracks(ctx, area, frame);
+      updateOverlayPlaybackChip(frame);
+    }
+
+    function runOverlayLoop() {
+      if (state.overlayAnimation) cancelAnimationFrame(state.overlayAnimation);
+      const tick = () => {
+        drawVideoOverlay();
+        const video = $("video");
+        if (!video.paused && !video.ended) {
+          state.overlayAnimation = requestAnimationFrame(tick);
+        }
+      };
+      state.overlayAnimation = requestAnimationFrame(tick);
+    }
+
+    async function loadSessionOverlays(session, force = false) {
+      if (!session || !session.session_id) {
+        resetOverlayState();
+        return;
+      }
+      const status = session.status || "";
+      const sameSession = state.overlaySessionId === session.session_id;
+      const keepRefreshing = ["processing", "replaying", "queued"].includes(status);
+      const now = Date.now();
+      if (!force && sameSession && state.overlayReady && !keepRefreshing) return;
+      if (!force && sameSession && now - state.overlayLastAttempt < 1600) return;
+      state.overlayLastAttempt = now;
+      try {
+        const response = await fetch(`/dashboard/sessions/${session.session_id}/overlays?limit=12000`);
+        if (!response.ok) throw new Error(await response.text());
+        const payload = await response.json();
+        state.overlaySessionId = session.session_id;
+        state.overlayFrames = payload.frames || [];
+        state.overlayGeometry = payload.geometry || {zones: [], entry_line_normalized: null};
+        state.overlayFrameWidth = payload.frame_width || null;
+        state.overlayFrameHeight = payload.frame_height || null;
+        state.overlaySampleInterval = payload.sample_interval_seconds || state.overlaySampleInterval || 0.7;
+        state.overlayFirstSecond = payload.first_video_time_seconds ?? null;
+        state.overlayLastSecond = payload.last_video_time_seconds ?? null;
+        state.overlayReady = Boolean(payload.available);
+        if (payload.available) {
+          const people = payload.valid_person_track_count ?? payload.person_track_count ?? payload.unique_track_count ?? 0;
+          const suspect = payload.suspect_track_count || 0;
+          const samples = payload.frame_count || 0;
+          const label = suspect
+            ? `${people} valid people (${suspect} suspect)`
+            : `${people} valid people`;
+          state.overlaySummaryLabel = `${label} - ${samples} sampled frames`;
+          setOverlayChip(state.overlaySummaryLabel, "good");
+        } else if (status === "error" || session.overlay_status === "failed") {
+          state.overlaySummaryLabel = "AI overlay failed";
+          setOverlayChip("AI overlay failed", "bad");
+        } else {
+          state.overlaySummaryLabel = "AI overlay building";
+          setOverlayChip("AI overlay building", "warn");
+        }
+        drawVideoOverlay();
+      } catch (error) {
+        state.overlayReady = false;
+        state.overlaySummaryLabel = "AI overlay unavailable";
+        setOverlayChip("AI overlay unavailable", "warn");
+      }
+    }
+
+    function selectedSource() {
+      const id = $("sourceSelect").value;
+      return state.sources.find((source) => source.source_id === id) || null;
+    }
+
+    function setSourceMode(mode) {
+      state.sourceMode = mode;
+      document.querySelectorAll("[data-source-mode]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.sourceMode === mode);
+      });
+      $("savedSourceBlock").hidden = mode !== "saved";
+      $("uploadSourceBlock").hidden = mode !== "upload";
+      $("liveSourceBlock").hidden = mode !== "live";
+
+      if (mode === "saved") {
+        updatePreview(selectedSource());
+      } else if (mode === "upload") {
+        const file = $("guidedUploadFile").files[0];
+        if (file) {
+          previewUploadedFile(file);
+        } else {
+          if (state.localPreviewUrl) {
+            URL.revokeObjectURL(state.localPreviewUrl);
+            state.localPreviewUrl = null;
+          }
+          resetOverlayState();
+          $("video").removeAttribute("src");
+          $("video").load();
+          $("videoEmpty").style.display = "grid";
+          setChip("sourceChip", "Upload CCTV video", "warn");
+        }
+      } else if (mode === "live") {
+        if (state.localPreviewUrl) {
+          URL.revokeObjectURL(state.localPreviewUrl);
+          state.localPreviewUrl = null;
+        }
+        resetOverlayState();
+        $("video").removeAttribute("src");
+        $("video").load();
+        $("videoEmpty").style.display = "grid";
+        setChip("sourceChip", "Live CCTV source", "warn");
+      }
+      renderGuidedSteps();
+    }
+
+    function sourceDurationSeconds(source) {
+      const duration = Number(source && source.video_metadata && source.video_metadata.duration_seconds);
+      return Number.isFinite(duration) && duration > 0 ? duration : 0;
+    }
+
+    function syncAnalysisWindowToSource(source) {
+      const duration = sourceDurationSeconds(source);
+      if (!duration) return;
+      const seconds = Math.min(900, Math.max(3, Math.ceil(duration)));
+      $("maxSeconds").value = String(seconds);
+    }
+
+    function syncAnalysisWindowToLoadedVideo() {
+      const duration = Number($("video").duration || 0);
+      if (!Number.isFinite(duration) || duration <= 0) return;
+      const seconds = Math.min(900, Math.max(3, Math.ceil(duration)));
+      $("maxSeconds").value = String(seconds);
+    }
+
+    function updatePreview(source) {
+      const video = $("video");
+      const empty = $("videoEmpty");
+      resetOverlayState();
+      if (source && source.store_id) {
+        state.currentStoreId = source.store_id;
+        $("searchStoreLabel").textContent = source.store_id;
+        if ([...$("guidedStoreId").options].some((option) => option.value === source.store_id)) {
+          $("guidedStoreId").value = source.store_id;
+          populateGuidedCameraSelect();
+        }
+      }
+      if (source && source.camera_id) {
+        $("cameraFilter").value = source.camera_id;
+        if ([...$("guidedCameraId").options].some((option) => option.value === source.camera_id)) {
+          $("guidedCameraId").value = source.camera_id;
+        }
+      }
+      if (source && source.role && [...$("guidedCameraRole").options].some((option) => option.value === source.role)) {
+        $("guidedCameraRole").value = source.role;
+      }
+      if (source && source.media_url) {
+        if (state.localPreviewUrl) {
+          URL.revokeObjectURL(state.localPreviewUrl);
+          state.localPreviewUrl = null;
+        }
+        video.src = source.media_url;
+        syncAnalysisWindowToSource(source);
+        empty.style.display = "none";
+        setChip("sourceChip", `${source.camera_id} ${source.role || ""}`.trim(), "good");
+        $("cameraId").value = source.camera_id || $("cameraId").value;
+        refreshGuidedValidation().catch(() => {});
+      } else {
+        video.removeAttribute("src");
+        video.load();
+        empty.style.display = "grid";
+        setChip("sourceChip", source ? "RTSP source" : "No source");
+      }
+    }
+
+    async function loadSources() {
+      const response = await fetch("/dashboard/sources");
+      const payload = await response.json();
+      state.sources = payload.sources || [];
+      const select = $("sourceSelect");
+      select.innerHTML = "";
+      for (const source of state.sources) {
+        const option = document.createElement("option");
+        option.value = source.source_id;
+        option.textContent = `${source.label} (${source.size_mb || 0} MB)`;
+        select.appendChild(option);
+      }
+      if (state.sources.length) {
+        updatePreview(state.sources[0]);
+      }
+    }
+
+    async function loadStores() {
+      try {
+        const response = await fetch("/dashboard/stores");
+        const payload = await response.json();
+        state.stores = payload.stores || [];
+      } catch (error) {
+        state.stores = [];
+      }
+      populateStoreSelect();
+      populateGuidedCameraSelect();
+      await refreshGuidedValidation();
+    }
+
+    async function loadQuality() {
+      const response = await fetch("/dashboard/quality");
+      const payload = await response.json();
+      if (!payload.available) {
+        setChip("qualityChip", "Data reliability pending", "warn");
+        return;
+      }
+      const score = payload.report.usp_quality_score;
+      setChip("qualityChip", score >= 80 ? "Data reliability ready" : "Data needs review", score >= 80 ? "good" : "warn");
+    }
+
+    async function refreshGuidedValidation() {
+      renderGuidedSteps();
+      const params = new URLSearchParams({
+        store_id: $("guidedStoreId").value || "STORE_BLR_002",
+        camera_id: $("guidedCameraId").value || "CAM_1",
+        camera_role: $("guidedCameraRole").value || "zone",
+        analysis_mode: $("guidedAnalysisMode").value || "full_store"
+      });
+      try {
+        const response = await fetch(`/dashboard/onboarding/validate?${params.toString()}`);
+        if (!response.ok) throw new Error(await response.text());
+        const payload = await response.json();
+        state.onboardingValidation = payload;
+        const readiness = payload.layout_readiness || {};
+        const effectiveMode = payload.effective_analysis_mode || readiness.effective_analysis_mode;
+        const isReady = readiness.status === "ready";
+        $("guidedLayoutStatus").textContent = isReady ? "Ready" : effectiveMode === "detection_only" ? "Detection only" : "Limited";
+        $("guidedEffectiveMode").textContent = modeLabel(effectiveMode);
+        $("guidedReadinessNote").textContent = (payload.warnings && payload.warnings[0]) || "Store layout is ready for this camera.";
+        $("guidedReadinessNote").style.color = isReady ? "var(--muted)" : "var(--amber)";
+      } catch (error) {
+        state.onboardingValidation = null;
+        $("guidedLayoutStatus").textContent = "Needs review";
+        $("guidedEffectiveMode").textContent = "Detection only";
+        $("guidedReadinessNote").textContent = error.message;
+        $("guidedReadinessNote").style.color = "var(--red)";
+      }
+      renderGuidedSteps();
+    }
+
+    async function checkHealth() {
+      try {
+        await fetch("/health");
+        setChip("apiChip", "System ready", "good");
+      } catch (error) {
+        setChip("apiChip", "System offline", "bad");
+      }
+    }
+
+    function renderMetrics(snapshot) {
+      const metrics = snapshot.metrics || {};
+      const eventCounts = metrics.event_counts || {};
+      const quality = snapshot.quality || {};
+      const profile = snapshot.store_profile || {};
+      $("visitors").textContent = fmt(metrics.unique_visitors);
+      $("eventsTotal").textContent = fmt(eventCounts.total ?? quality.total_events);
+      $("queueDepth").textContent = fmt(metrics.queue_depth);
+      const conversion = metrics.conversion || {};
+      $("conversion").textContent = `${fmt(conversion.display_rate_pct ?? metrics.conversion_rate_pct)}%`;
+      $("conversionSub").textContent = conversion.confidence === "ESTIMATED" ? "billing intent est." : "POS confirmed";
+      $("abandon").textContent = `${fmt(metrics.abandonment_rate_pct)}%`;
+      $("storeLabel").textContent = profile.store_name || snapshot.store_id || "--";
+      $("heatmapLabel").textContent = snapshot.updated_at ? new Date(snapshot.updated_at).toLocaleTimeString() : "--";
+      if (snapshot.store_id) {
+        state.currentStoreId = snapshot.store_id;
+        $("searchStoreLabel").textContent = snapshot.store_id;
+      }
+      renderPosMatchSummary(metrics);
+    }
+
+    function renderPosMatchSummary(metrics = {}) {
+      const pos = metrics.pos || {};
+      const conversion = metrics.conversion || {};
+      const transactions = Number(pos.transaction_count || 0);
+      const matched = Number(pos.matched_transaction_count || 0);
+      if (!transactions) {
+        $("posMatchStatus").textContent = "--";
+        $("posMatchNote").textContent = conversion.note || "Import POS to confirm conversion.";
+        return;
+      }
+      const rate = transactions ? Math.round((matched / transactions) * 100) : 0;
+      $("posMatchStatus").textContent = `${matched}/${transactions} matched`;
+      $("posMatchNote").textContent = `${rate}% POS match rate - ${conversion.note || "Matched within the 5 minute billing window."}`;
+    }
+
+    function topZone(snapshot) {
+      const zones = ((snapshot.heatmap && snapshot.heatmap.zones) || [])
+        .slice()
+        .sort((a, b) => (b.normalized_score || 0) - (a.normalized_score || 0));
+      return zones[0] || null;
+    }
+
+    function renderLiveIntelligence(snapshot, session) {
+      const metrics = snapshot.metrics || {};
+      const eventCounts = metrics.event_counts || {};
+      const queue = metrics.queue || {};
+      const conversion = metrics.conversion || {};
+      const pos = metrics.pos || {};
+      const visitors = Number(metrics.unique_visitors || 0);
+      const totalEvents = Number(eventCounts.total || snapshot.quality?.total_events || 0);
+      const selectedZone = topZone(snapshot);
+      const status = session && session.status;
+      const sourceLabel = session && session.source
+        ? (session.source.camera_id || session.source.label || "selected CCTV")
+        : (snapshot.store_profile && snapshot.store_profile.store_name) || snapshot.store_id || "this store";
+
+      $("intelligenceScope").textContent = session ? "current CCTV run" : "store snapshot";
+
+      if (status === "processing" || status === "replaying") {
+        $("intelligenceHeadline").textContent = `Analyzing ${sourceLabel}: valid physical people are being tracked, events are streaming, and store metrics are updating live.`;
+      } else if (status === "complete") {
+        $("intelligenceHeadline").textContent = `Analysis complete for ${sourceLabel}: ${visitors} valid people and ${totalEvents} business events are scoped to this CCTV run.`;
+      } else if (totalEvents > 0) {
+        $("intelligenceHeadline").textContent = `Showing latest CCTV intelligence for ${sourceLabel}: person movement, zones, queue, and conversion signals are available.`;
+      } else {
+        $("intelligenceHeadline").textContent = "Start analysis to turn CCTV into valid person movement, zone engagement, and queue intelligence.";
+      }
+
+      $("movementInsight").textContent = visitors ? `${visitors} valid people` : "--";
+      $("movementDetail").textContent = totalEvents
+        ? `${totalEvents} events analyzed; reflection/weak physical-person tracks are excluded from metrics.`
+        : "No valid person tracks yet.";
+
+      $("zoneInsight").textContent = selectedZone ? (selectedZone.label || selectedZone.zone_id) : "--";
+      $("zoneDetail").textContent = selectedZone
+        ? `${selectedZone.visit_count || 0} visits; avg dwell ${selectedZone.avg_dwell_seconds || 0}s.`
+        : "No zone engagement yet.";
+
+      const latestDepth = Number(queue.latest_depth ?? metrics.queue_depth ?? 0);
+      const maxDepth = Number(queue.max_depth || latestDepth || 0);
+      const abandoned = Number(queue.abandoned_visitor_count || 0);
+      $("queueInsight").textContent = latestDepth ? `${latestDepth} in queue` : abandoned ? `${abandoned} lost` : "--";
+      $("queueDetail").textContent = (queue.join_events || abandoned || maxDepth)
+        ? `${queue.join_events || 0} joins; max depth ${maxDepth}; ${abandoned} possible abandons.`
+        : "Billing queue not observed yet.";
+
+      const conversionRate = conversion.display_rate_pct ?? metrics.conversion_rate_pct ?? 0;
+      const conversionConfidence = conversion.confidence || (pos.transaction_count ? "CONFIRMED" : "ESTIMATED");
+      $("conversionInsight").textContent = `${fmt(conversionRate)}%`;
+      $("conversionDetail").textContent = conversionConfidence === "CONFIRMED"
+        ? `${pos.matched_transaction_count || 0}/${pos.transaction_count || 0} POS transactions matched.`
+        : "Estimated from billing intent until POS is imported.";
+    }
+
+    function renderOperations(snapshot) {
+      const quality = snapshot.quality || {};
+      const cameras = snapshot.camera_health || [];
+      const score = quality.quality_score;
+      const grade = quality.quality_grade || "--";
+      const total = quality.total_events || 0;
+      const low = quality.low_confidence_events || 0;
+      const selectedCameraId = $("cameraId").value || (selectedSource() && selectedSource().camera_id);
+      const selected = cameras.find((camera) => camera.camera_id === selectedCameraId) || cameras[0];
+      const onlineCount = cameras.filter((camera) => camera.status === "ONLINE").length;
+      const attentionCount = cameras.filter((camera) => ["DEGRADED", "STALE", "NO_EVENTS"].includes(camera.status)).length;
+
+      const qualityLabel = score === undefined ? "--" : score >= 85 ? "Good" : score >= 70 ? "Needs review" : "Weak";
+      $("liveQuality").textContent = score === undefined ? "--" : `${qualityLabel} (${score}/100, ${grade})`;
+      $("lowConfidence").textContent = total ? `${low} of ${total} signals` : "--";
+      $("opsSummary").textContent = cameras.length ? `${onlineCount}/${cameras.length} online` : "--";
+
+      if (score !== undefined) {
+        setChip("qualityChip", `Data reliability: ${qualityLabel}`, score >= 85 ? "good" : score >= 70 ? "warn" : "bad");
+      }
+
+      if (selected) {
+        $("selectedCameraDot").className = dotClass(selected.status);
+        $("selectedCameraStatus").textContent = selected.status || "Unknown";
+        const trackerName = $("trackerBackend").selectedOptions[0]?.textContent || "Auto profile";
+        $("trackingStatus").textContent = selected.event_count ? `${trackerName} active` : trackerName;
+        $("analysisMode").textContent = state.activeSession ? "Current session only" : "Ready";
+      }
+
+      $("cameraHealthList").innerHTML = cameras.map((camera) => {
+        const tone = statusTone(camera.status);
+        const latest = camera.latest_event_timestamp ? new Date(camera.latest_event_timestamp).toLocaleTimeString() : "no events";
+        return `
+          <div class="camera-card">
+            <div class="top">
+              <strong><span class="${dotClass(camera.status)}"></span>${camera.camera_id} ${camera.role || ""}</strong>
+              <span class="status-pill ${tone}">${camera.status}</span>
+            </div>
+            <div class="tiny">${camera.event_count || 0} events - ${camera.low_confidence_event_count || 0} low confidence - ${latest}</div>
+          </div>
+        `;
+      }).join("") || `<div class="tiny">No camera health data yet</div>`;
+    }
+
+    function funnelStageLabel(stage) {
+      const labels = {
+        entry: "Entry",
+        zone_visit: "Zone visit",
+        billing_queue: "Billing",
+        purchase: "Purchase",
+        exit: "Exit"
+      };
+      return labels[stage] || String(stage || "").replaceAll("_", " ");
+    }
+
+    function renderFunnel(snapshot) {
+      const stages = (snapshot.funnel && snapshot.funnel.stages) || [];
+      const max = Math.max(1, ...stages.map((stage) => stage.count || 0));
+      if (stages.length) {
+        const first = stages[0];
+        const last = stages[stages.length - 1];
+        const firstCount = Number(first.count || 0);
+        const lastCount = Number(last.count || 0);
+        const retainPct = firstCount ? Math.round((lastCount / firstCount) * 100) : 0;
+        $("funnelInsight").textContent = `${funnelStageLabel(first.stage)} to ${funnelStageLabel(last.stage)}: ${lastCount}/${firstCount} valid people reached the final observed step (${retainPct}%).`;
+      } else {
+        $("funnelInsight").textContent = "Start monitoring to build the person journey.";
+      }
+      $("funnel").innerHTML = stages.map((stage) => {
+        const width = Math.max(3, ((stage.count || 0) / max) * 100);
+        return `
+          <div class="bar-row">
+            <span>${funnelStageLabel(stage.stage)}</span>
+            <div class="track"><div class="fill" style="width:${width}%"></div></div>
+            <strong>${stage.count || 0}</strong>
+          </div>
+        `;
+      }).join("") || `<div class="tiny">No funnel events yet</div>`;
+    }
+
+    function heatColor(score) {
+      const safe = Math.max(0, Math.min(100, Number(score || 0)));
+      const green = Math.round(58 + safe * 1.1);
+      const blue = Math.round(82 + safe * 0.9);
+      return `linear-gradient(135deg, rgba(32,36,42,1), rgba(${green}, ${blue}, 132, 0.38))`;
+    }
+
+    function renderHeatmap(snapshot) {
+      const zones = ((snapshot.heatmap && snapshot.heatmap.zones) || [])
+        .slice()
+        .sort((a, b) => (b.normalized_score || 0) - (a.normalized_score || 0))
+        .slice(0, 8);
+      const best = zones[0];
+      $("heatmapInsightSummary").textContent = best
+        ? `${best.label || best.zone_id} leads engagement with ${best.visit_count || 0} visits and ${best.avg_dwell_seconds || 0}s average dwell.`
+        : "Start monitoring to find the strongest zone.";
+      $("heatmap").innerHTML = zones.map((zone) => `
+        <div class="zone" style="background:${heatColor(zone.normalized_score)}">
+          <strong>${zone.label || zone.zone_id}</strong>
+          <span>${zone.visit_count || 0} visits - ${zone.avg_dwell_seconds || 0}s</span>
+        </div>
+      `).join("") || `<div class="tiny">No zone activity yet</div>`;
+    }
+
+    function eventDisplayName(event) {
+      const labels = {
+        ENTRY: "Entered store",
+        EXIT: "Exited store",
+        REENTRY: "Re-entered",
+        ZONE_ENTER: "Visited zone",
+        ZONE_EXIT: "Left zone",
+        ZONE_DWELL: "Dwelled in zone",
+        BILLING_QUEUE_JOIN: "Joined billing",
+        BILLING_QUEUE_ABANDON: "Left billing queue",
+        BILLING_QUEUE_JOIN_LOW_CONF: "Billing join low confidence",
+        BILLING_QUEUE_ABANDON_LOW_CONF: "Billing abandon low confidence",
+        ZONE_EXIT_LOW_CONF: "Zone exit low confidence"
+      };
+      return labels[event.event_type] || event.event_type || "Event";
+    }
+
+    function eventMeta(event, includeRole = false) {
+      const parts = [
+        event.camera_id,
+        event.visitor_id,
+        event.zone_id || "floor"
+      ].filter(Boolean);
+      if (includeRole) parts.push("person");
+      if (event.metadata && event.metadata.data_confidence_flag === "LOW") parts.push("low confidence");
+      return parts.join(" - ");
+    }
+
+    function renderEvents(events) {
+      const rows = (events || []).slice(-20).reverse();
+      $("eventFeed").innerHTML = rows.map((event) => `
+        <div class="event clickable" data-visitor-id="${event.visitor_id}">
+          <span class="event-type">${eventDisplayName(event)}</span>
+          <span class="event-meta">${eventMeta(event, true)}</span>
+          <span class="tiny">${new Date(event.timestamp).toLocaleTimeString()}</span>
+        </div>
+      `).join("") || `<div class="tiny">No live events yet</div>`;
+    }
+
+    function renderSearchResults(events) {
+      const rows = events || [];
+      $("searchResults").innerHTML = rows.map((event) => `
+        <div class="event clickable" data-visitor-id="${event.visitor_id}">
+          <span class="event-type">${eventDisplayName(event)}</span>
+          <span class="event-meta">${eventMeta(event, true)}</span>
+          <span class="tiny">${new Date(event.timestamp).toLocaleTimeString()}</span>
+        </div>
+      `).join("") || `<div class="tiny">No matching events</div>`;
+    }
+
+    function renderTimeline(payload) {
+      state.selectedVisitorId = payload.visitor_id || null;
+      $("timelineVisitorLabel").textContent = payload.visitor_id || "select visitor";
+      const hasStaffEvent = (payload.events || []).some((event) => event.is_staff);
+      if (payload.visitor_id) {
+        $("staffCorrectionStatus").textContent = hasStaffEvent
+          ? `${payload.visitor_id} is currently treated as staff.`
+          : `${payload.visitor_id} is currently treated as visitor.`;
+        $("staffCorrectionStatus").style.color = hasStaffEvent ? "var(--amber)" : "var(--green)";
+      }
+      const summary = `
+        <div class="camera-card">
+          <div class="top">
+            <strong>${payload.visitor_id || "--"}</strong>
+            <span class="status-pill ${payload.billing_queue_abandoned ? "warn" : "good"}">${payload.event_count || 0} events</span>
+          </div>
+          <div class="tiny">${(payload.zones_seen || []).join(", ") || "No zones"} - dwell ${payload.total_dwell_seconds || 0}s</div>
+        </div>
+      `;
+      const rows = (payload.events || []).map((event) => `
+        <div class="event">
+          <span class="event-type">${eventDisplayName(event)}</span>
+          <span class="event-meta">${eventMeta(event, true)}</span>
+          <span class="tiny">${new Date(event.timestamp).toLocaleTimeString()}</span>
+        </div>
+      `).join("");
+      $("visitorTimeline").innerHTML = summary + (rows || `<div class="tiny">No timeline events found.</div>`);
+    }
+
+    function setPosStatus(text, tone = "") {
+      $("posImportStatus").textContent = text;
+      $("posImportStatus").style.color = tone === "bad" ? "var(--red)" : tone === "good" ? "var(--green)" : tone === "warn" ? "var(--amber)" : "var(--text)";
+    }
+
+    function setStaffCorrectionStatus(text, tone = "") {
+      $("staffCorrectionStatus").textContent = text;
+      $("staffCorrectionStatus").style.color = tone === "bad" ? "var(--red)" : tone === "good" ? "var(--green)" : tone === "warn" ? "var(--amber)" : "var(--muted)";
+    }
+
+    function renderPosPreview(payload) {
+      state.posPreview = payload;
+      const rows = payload.sample || [];
+      $("posPreviewList").innerHTML = rows.map((row) => `
+        <div class="camera-card">
+          <div class="top">
+            <strong>${row.transaction_id}</strong>
+            <span class="status-pill good">Rs ${fmt(row.basket_value_inr)}</span>
+          </div>
+          <div class="tiny">${new Date(row.timestamp).toLocaleString()} - ${row.store_id}</div>
+        </div>
+      `).join("") || `<div class="tiny">No transactions found in this CSV.</div>`;
+      const window = payload.window || {};
+      $("posMatchNote").textContent = payload.transaction_count
+        ? `${payload.transaction_count} transactions, Rs ${fmt(payload.total_sales_inr)} sales, ${window.start || "--"} to ${window.end || "--"}`
+        : "The uploaded POS file did not contain transactions.";
+    }
+
+    function appendPosMapping(form) {
+      const fields = {
+        transaction_id_column: $("posTxnColumn").value,
+        amount_column: $("posAmountColumn").value,
+        timestamp_column: $("posTimestampColumn").value,
+        date_column: $("posDateColumn").value,
+        time_column: $("posTimeColumn").value,
+        store_id_column: $("posStoreColumn").value,
+        timezone_offset: $("posTimezoneOffset").value || "+05:30"
+      };
+      for (const [key, value] of Object.entries(fields)) {
+        const cleaned = String(value || "").trim();
+        if (cleaned || key === "timezone_offset") {
+          form.append(key, cleaned);
+        }
+      }
+    }
+
+    async function previewPosUpload() {
+      const file = $("posUploadFile").files[0];
+      if (!file) {
+        setPosStatus("Choose a CSV first", "warn");
+        return;
+      }
+      const storeId = activeStoreId();
+      const form = new FormData();
+      form.append("file", file);
+      appendPosMapping(form);
+      setPosStatus("Previewing POS...", "warn");
+      const response = await fetch(`/dashboard/stores/${encodeURIComponent(storeId)}/pos/preview`, {
+        method: "POST",
+        body: form
+      });
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      renderPosPreview(payload);
+      setPosStatus(`${payload.transaction_count || 0} transactions ready`, "good");
+    }
+
+    async function importPosUpload() {
+      const file = $("posUploadFile").files[0];
+      if (!file) {
+        setPosStatus("Choose a CSV first", "warn");
+        return;
+      }
+      const storeId = activeStoreId();
+      const form = new FormData();
+      form.append("file", file);
+      appendPosMapping(form);
+      setPosStatus("Importing POS...", "warn");
+      const response = await fetch(`/dashboard/stores/${encodeURIComponent(storeId)}/pos/import`, {
+        method: "POST",
+        body: form
+      });
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      renderPosPreview(payload);
+      setPosStatus(`${payload.upserted ?? payload.transaction_count ?? 0} transactions imported`, "good");
+      await loadPosMatches();
+      await refreshSnapshot().catch(() => {});
+    }
+
+    async function loadPosMatches() {
+      const storeId = activeStoreId();
+      const params = new URLSearchParams();
+      if (state.activeSession && state.activeSession.session_id) {
+        params.set("session_id", state.activeSession.session_id);
+      }
+      const suffix = params.toString() ? `?${params.toString()}` : "";
+      const response = await fetch(`/dashboard/stores/${encodeURIComponent(storeId)}/pos/matches${suffix}`);
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      state.posMatches = payload;
+      const conversion = payload.conversion || {};
+      const pos = payload.pos || {};
+      const transactions = Number(pos.transaction_count || 0);
+      const matched = Number(pos.matched_transaction_count || 0);
+      $("posMatchStatus").textContent = transactions ? `${matched}/${transactions} matched` : "--";
+      $("posMatchNote").textContent = conversion.note || (transactions ? "POS imported." : "Import POS to confirm conversion.");
+      return payload;
+    }
+
+    async function applyStaffCorrection(isStaff) {
+      if (!state.selectedVisitorId) {
+        setStaffCorrectionStatus("Select a visitor from the event feed or search results first.", "warn");
+        return;
+      }
+      const storeId = activeStoreId();
+      const body = {
+        is_staff: Boolean(isStaff),
+        reason: "operator_dashboard_review",
+        metadata: {
+          source: "live_dashboard",
+          applied_at: new Date().toISOString()
+        }
+      };
+      if (state.activeSession && state.activeSession.session_id) {
+        body.session_id = state.activeSession.session_id;
+      }
+      setStaffCorrectionStatus(`Saving role override for ${state.selectedVisitorId}...`, "warn");
+      const response = await fetch(
+        `/dashboard/stores/${encodeURIComponent(storeId)}/visitors/${encodeURIComponent(state.selectedVisitorId)}/staff-correction`,
+        {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(body)
+        }
+      );
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      setStaffCorrectionStatus(
+        `${state.selectedVisitorId} role override saved (${payload.affected_event_count || 0} events affected).`,
+        "good"
+      );
+      await loadTimeline(state.selectedVisitorId).catch(() => {});
+      await refreshSnapshot().catch(() => {});
+      await loadPosMatches().catch(() => {});
+    }
+
+    function renderAlerts(snapshot, session) {
+      const errors = [];
+      if (session && session.error) errors.push(session.error);
+      for (const value of Object.values(snapshot.errors || {})) errors.push(value);
+      for (const anomaly of snapshot.anomalies || []) {
+        const title = anomaly.message || anomaly.anomaly_reason || anomaly.reason || anomaly.type || "Anomaly";
+        const action = anomaly.suggested_action ? ` ${anomaly.suggested_action}` : "";
+        const zone = anomaly.zone_id ? ` (${anomaly.zone_id})` : "";
+        errors.push(`${title}${zone}.${action}`);
+      }
+      $("alerts").innerHTML = errors.map((item) => `<div class="error-item">${item}</div>`).join("") || `<div class="tiny">No active alerts</div>`;
+    }
+
+    function fallbackProgress(session) {
+      const status = session && session.status;
+      const stage = session && session.stage;
+      const labels = {
+        queued: "Waiting for worker",
+        yolo_detection: "Running detection",
+        api_replay: "Generating events",
+        complete: "Complete",
+        failed: "Failed"
+      };
+      const keys = ["upload", "queued", "detection", "events", "pos", "report", "complete"];
+      const current = status === "complete" ? keys.length - 1 : stage === "api_replay" ? 3 : stage === "yolo_detection" ? 2 : 1;
+      return {
+        percent: status === "complete" ? 100 : current * 14,
+        label: labels[stage] || labels[status] || "Waiting for worker",
+        steps: keys.map((key, index) => ({
+          label: key === "pos" ? "Matching POS" : key === "report" ? "Building result" : key.charAt(0).toUpperCase() + key.slice(1),
+          status: status === "complete" || index < current ? "complete" : index === current ? "current" : "pending"
+        }))
+      };
+    }
+
+    function renderSessionProgress(session) {
+      const progress = (session && session.progress) || fallbackProgress(session || {});
+      $("sessionProgressFill").style.width = `${Math.max(0, Math.min(100, Number(progress.percent || 0)))}%`;
+      renderStepList("sessionProgressSteps", progress.steps || []);
+    }
+
+    function updateReportLinks(session) {
+      const links = [
+        ["downloadReportMd", "md"],
+        ["downloadReportCsv", "csv"],
+        ["downloadReportJson", "json"]
+      ];
+      for (const [id, format] of links) {
+        const link = $(id);
+        if (!link) continue;
+        if (!session || !session.session_id) {
+          link.href = "#";
+          link.classList.add("disabled");
+          link.setAttribute("aria-disabled", "true");
+          continue;
+        }
+        link.href = `/dashboard/sessions/${encodeURIComponent(session.session_id)}/report?format=${format}`;
+        link.classList.remove("disabled");
+        link.removeAttribute("aria-disabled");
+      }
+    }
+
+    function renderSessionResult(session) {
+      updateReportLinks(session);
+      if (!session) {
+        $("sessionResultStatus").textContent = "Waiting";
+        $("sessionModeLabel").textContent = "--";
+        $("sessionResultNote").textContent = "Start a session to generate scoped results.";
+        $("sessionProgressFill").style.width = "0%";
+        renderStepList("sessionProgressSteps", []);
+        return;
+      }
+      const readiness = session.layout_readiness || {};
+      const status = session.status || "queued";
+      const mode = session.analysis_mode || readiness.effective_analysis_mode;
+      const tracker = session.yolo && session.yolo.tracker_backend
+        ? String(session.yolo.tracker_backend).replace("bytetrack", "ByteTrack").replace("botsort", "BoT-SORT").replace("centroid", "Centroid")
+        : "Auto profile";
+      $("sessionModeLabel").textContent = modeLabel(mode);
+      if (status === "complete") {
+        const eventTotal = session.inserted_events ?? session.generated_events ?? 0;
+        const peopleTracked = session.overlay_tracks || 0;
+        $("sessionResultStatus").textContent = "Ready";
+        $("sessionResultNote").textContent = `Analysis complete: ${eventTotal} scoped events and ${peopleTracked} tracked person boxes from this CCTV run. Tracker: ${tracker}.`;
+      } else if (status === "error") {
+        $("sessionResultStatus").textContent = "Failed";
+        $("sessionResultNote").textContent = session.error || "Analysis failed.";
+      } else {
+        $("sessionResultStatus").textContent = "Building";
+        $("sessionResultNote").textContent = status === "replaying"
+          ? `Events are being streamed into the dashboard for this video. Tracker: ${tracker}.`
+          : readiness.status === "detection_only"
+          ? `Layout is limited, so this run will stay detection-only. Tracker: ${tracker}.`
+          : `Detecting people, assigning IDs, and building live store intelligence. Tracker: ${tracker}.`;
+      }
+    }
+
+    function renderSession(session) {
+      const previousSessionId = state.activeSession && state.activeSession.session_id;
+      state.activeSession = session;
+      if (session && previousSessionId && previousSessionId !== session.session_id) {
+        resetOverlayState();
+      }
+      $("sessionId").textContent = session ? session.session_id : "not started";
+      $("sessionStatus").textContent = session ? (session.status || "queued") : "Idle";
+      $("sessionEvents").textContent = session ? fmt(session.inserted_events ?? session.generated_events ?? 0) : "0";
+      $("sessionSource").textContent = session && session.source ? (session.source.camera_id || session.source.label || "Selected camera") : "No source";
+      $("sessionScope").textContent = session ? "Current session only" : "Current run";
+      renderSessionProgress(session);
+      renderSessionResult(session);
+      if (session && session.session_id) {
+        const index = (state.sessions || []).findIndex((item) => item.session_id === session.session_id);
+        if (index >= 0) state.sessions[index] = {...state.sessions[index], ...session};
+        else state.sessions = [session, ...(state.sessions || [])].slice(0, 50);
+        renderSessionHistory();
+      }
+      if (!session) {
+        setChip("sessionChip", "No active session");
+        setChip("stageChip", "Idle");
+        resetOverlayState();
+        updateRunControls(null);
+        return;
+      }
+      if (session.store_id) {
+        state.currentStoreId = session.store_id;
+        $("searchStoreLabel").textContent = session.store_id;
+      }
+      const status = session.status || "queued";
+      const tone = status === "complete" ? "good" : status === "error" ? "bad" : status === "processing" ? "warn" : "good";
+      setChip("sessionChip", status, tone);
+      setChip("stageChip", session.stage || status, tone);
+      updateRunControls(session);
+
+      const source = session.source || {};
+      if (source.media_url && $("video").src.indexOf(source.media_url) === -1) {
+        updatePreview(source);
+      }
+      if (status === "replaying" && state.previewStartedFor !== session.session_id && source.media_url) {
+        state.previewStartedFor = session.session_id;
+        $("video").currentTime = 0;
+        $("video").play().catch(() => {});
+      }
+      loadSessionOverlays(session).catch(() => setChip("overlayChip", "AI overlay unavailable", "warn"));
+    }
+
+    function renderPayload(payload) {
+      const session = payload.session || null;
+      const snapshot = payload.snapshot || payload;
+      state.latestSnapshot = snapshot;
+      renderSession(session);
+      renderMetrics(snapshot);
+      renderLiveIntelligence(snapshot, session);
+      renderOperations(snapshot);
+      renderFunnel(snapshot);
+      renderHeatmap(snapshot);
+      renderEvents((session && session.last_events && session.last_events.length) ? session.last_events : snapshot.recent_events);
+      renderAlerts(snapshot, session);
+    }
+
+    function connectSession(sessionId) {
+      if (state.eventSource) {
+        state.eventSource.close();
+      }
+      state.eventSource = new EventSource(`/dashboard/sessions/${sessionId}/stream`);
+      state.eventSource.onmessage = (event) => renderPayload(JSON.parse(event.data));
+      state.eventSource.onerror = () => setChip("sessionChip", "Stream reconnecting", "warn");
+    }
+
+    function connectFallbackStream(storeId) {
+      if (state.fallbackSource) {
+        state.fallbackSource.close();
+      }
+      state.currentStoreId = storeId || state.currentStoreId;
+      state.fallbackSource = new EventSource(`/dashboard/stream?store_id=${encodeURIComponent(activeStoreId())}`);
+      state.fallbackSource.onmessage = (event) => {
+        if (!state.activeSession) renderPayload(JSON.parse(event.data));
+      };
+      state.fallbackSource.onerror = () => setChip("apiChip", "System reconnecting", "warn");
+    }
+
+    async function startSession(extra = {}) {
+      const source = selectedSource();
+      const selectedRole = extra.camera_role || (source && source.role) || $("guidedCameraRole").value || "zone";
+      const body = {
+        source_id: source ? source.source_id : null,
+        camera_id: extra.camera_id || (source && source.camera_id) || $("cameraId").value || "CAM_1",
+        store_id: extra.store_id || (source ? source.store_id : null),
+        camera_role: selectedRole,
+        session_label: extra.session_label || "",
+        analysis_mode: extra.analysis_mode || $("guidedAnalysisMode").value || "full_store",
+        max_seconds: Number($("maxSeconds").value),
+        process_fps: Number($("processFps").value),
+        replay_speed: Number($("replaySpeed").value),
+        min_area: Number($("minArea").value),
+        yolo_conf: Number($("yoloConf").value),
+        yolo_iou: Number($("yoloIou").value),
+        yolo_imgsz: 960,
+        tracker_backend: $("trackerBackend").value,
+        ...extra
+      };
+      const response = await fetch("/dashboard/sessions", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error);
+      }
+      const payload = await response.json();
+      renderSession(payload.session);
+      connectSession(payload.session.session_id);
+      loadSessions().catch(() => {});
+    }
+
+    function setGuidedStatus(text, tone = "") {
+      const el = $("guidedUploadStatus");
+      el.textContent = text;
+      el.style.color = tone === "bad" ? "var(--red)" : tone === "good" ? "var(--green)" : tone === "warn" ? "var(--amber)" : "var(--muted)";
+    }
+
+    function previewUploadedFile(file) {
+      if (state.localPreviewUrl) {
+        URL.revokeObjectURL(state.localPreviewUrl);
+        state.localPreviewUrl = null;
+      }
+      if (!file) {
+        updatePreview(selectedSource());
+        return;
+      }
+      resetOverlayState();
+      state.localPreviewUrl = URL.createObjectURL(file);
+      $("video").src = state.localPreviewUrl;
+      $("videoEmpty").style.display = "none";
+      setChip("sourceChip", "Uploaded CCTV selected", "warn");
+    }
+
+    async function uploadSource() {
+      const file = $("uploadFile").files[0];
+      if (!file) return;
+      const form = new FormData();
+      form.append("file", file);
+      form.append("camera_id", $("cameraId").value || "CAM_1");
+      form.append("store_id", activeStoreId());
+      form.append("camera_role", (selectedSource() && selectedSource().role) || $("guidedCameraRole").value || "zone");
+      form.append("analysis_mode", $("guidedAnalysisMode").value || "full_store");
+      const response = await fetch("/dashboard/upload", {method: "POST", body: form});
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      await loadSources();
+      const select = $("sourceSelect");
+      select.value = payload.source.source_id;
+      updatePreview(payload.source);
+    }
+
+    async function uploadAndAnalyze() {
+      if (isSessionRunning()) return;
+      const file = $("guidedUploadFile").files[0];
+      if (state.sourceMode === "live") {
+        const rtsp = $("liveRtspUrl").value.trim();
+        if (!rtsp) {
+          setGuidedStatus("Enter a live CCTV stream URL first.", "warn");
+          renderGuidedSteps();
+          return;
+        }
+        const cameraId = $("guidedCameraId").value || "CAM_1";
+        const cameraRole = $("guidedCameraRole").value || "zone";
+        const storeId = $("guidedStoreId").value || "STORE_BLR_002";
+        const sessionLabel = $("guidedSessionLabel").value.trim() || `${storeId} ${cameraId} live CCTV`;
+        setGuidedStatus(`Connecting live CCTV for ${cameraId}...`, "warn");
+        await startSession({
+          source_id: null,
+          rtsp_url: rtsp,
+          store_id: storeId,
+          camera_id: cameraId,
+          camera_role: cameraRole,
+          session_label: sessionLabel,
+          analysis_mode: $("guidedAnalysisMode").value || "full_store"
+        });
+        setGuidedStatus(`Live CCTV session started: ${sessionLabel}`, "good");
+        renderGuidedSteps();
+        return;
+      }
+
+      if (state.sourceMode === "saved") {
+        const source = selectedSource();
+        if (!source) {
+          setGuidedStatus("Choose a saved CCTV source or upload a video first.", "warn");
+          renderGuidedSteps();
+          return;
+        }
+        const sessionLabel = $("guidedSessionLabel").value.trim() || source.label || `${source.store_id} ${source.camera_id} analysis`;
+        setGuidedStatus(`Starting analysis for ${source.camera_id || "selected CCTV"}...`, "warn");
+        await startSession({
+          source_id: source.source_id,
+          store_id: source.store_id,
+          camera_id: source.camera_id,
+          camera_role: source.role || "zone",
+          session_label: sessionLabel,
+          analysis_mode: $("guidedAnalysisMode").value || source.recommended_analysis_mode || "full_store"
+        });
+        setGuidedStatus(`Session started: ${sessionLabel}`, "good");
+        renderGuidedSteps();
+        return;
+      }
+
+      if (!file) {
+        setGuidedStatus("Choose a CCTV video file first.", "warn");
+        renderGuidedSteps();
+        return;
+      }
+
+      const storeId = $("guidedStoreId").value || "STORE_BLR_002";
+      const cameraRole = $("guidedCameraRole").value || "zone";
+      const cameraId = $("guidedCameraId").value || roleDefaultCamera(cameraRole);
+      const sessionLabel = $("guidedSessionLabel").value.trim() || `${storeId} ${cameraId} analysis`;
+      const analysisMode = $("guidedAnalysisMode").value || "full_store";
+
+      $("guidedUploadBtn").disabled = true;
+      try {
+        setGuidedStatus("Uploading video...", "warn");
+        const form = new FormData();
+        form.append("file", file);
+        form.append("store_id", storeId);
+        form.append("camera_id", cameraId);
+        form.append("camera_role", cameraRole);
+        form.append("session_label", sessionLabel);
+        form.append("analysis_mode", analysisMode);
+        const response = await fetch("/dashboard/upload", {method: "POST", body: form});
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+        const payload = await response.json();
+
+        await loadSources();
+        $("sourceSelect").value = payload.source.source_id;
+        $("cameraId").value = cameraId;
+        $("cameraFilter").value = cameraId;
+        updatePreview(payload.source);
+
+        const effectiveMode = payload.onboarding && payload.onboarding.effective_analysis_mode;
+        setGuidedStatus(`Starting isolated ${modeLabel(effectiveMode || analysisMode)} session...`, "warn");
+        await startSession({
+          source_id: payload.source.source_id,
+          store_id: storeId,
+          camera_id: cameraId,
+          camera_role: cameraRole,
+          session_label: sessionLabel,
+          analysis_mode: analysisMode
+        });
+        setGuidedStatus(`Session started: ${sessionLabel}`, "good");
+      } finally {
+        renderGuidedSteps();
+      }
+    }
+
+    async function stopSession() {
+      if (!state.activeSession) return;
+      await fetch(`/dashboard/sessions/${state.activeSession.session_id}/stop`, {method: "POST"});
+    }
+
+    async function searchEvents() {
+      const storeId = activeStoreId();
+      const params = new URLSearchParams();
+      params.set("limit", "30");
+      params.set("sort", "desc");
+      if (state.activeSession && state.activeSession.session_id) {
+        params.set("session_id", state.activeSession.session_id);
+      }
+      const eventType = $("eventTypeFilter").value;
+      const cameraId = $("cameraFilter").value.trim();
+      const visitorId = $("visitorFilter").value.trim();
+      const lowConfidence = $("confidenceFilter").value;
+      if (eventType) params.set("event_type", eventType);
+      if (cameraId) params.set("camera_id", cameraId);
+      if (visitorId) params.set("visitor_id", visitorId);
+      if (lowConfidence) params.set("low_confidence", lowConfidence);
+
+      $("searchStoreLabel").textContent = storeId;
+      const response = await fetch(`/dashboard/stores/${encodeURIComponent(storeId)}/events/search?${params.toString()}`);
+      if (!response.ok) throw new Error(await response.text());
+      const payload = await response.json();
+      renderSearchResults(payload.events || []);
+    }
+
+    async function loadTimeline(visitorId) {
+      if (!visitorId) return;
+      const storeId = activeStoreId();
+      $("timelineVisitorLabel").textContent = visitorId;
+      $("visitorTimeline").innerHTML = `<div class="tiny">Loading ${visitorId}...</div>`;
+      const params = new URLSearchParams();
+      if (state.activeSession && state.activeSession.session_id) {
+        params.set("session_id", state.activeSession.session_id);
+      }
+      const suffix = params.toString() ? `?${params.toString()}` : "";
+      const response = await fetch(`/dashboard/stores/${encodeURIComponent(storeId)}/visitors/${encodeURIComponent(visitorId)}/timeline${suffix}`);
+      if (!response.ok) throw new Error(await response.text());
+      renderTimeline(await response.json());
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-source-mode]").forEach((button) => {
+        button.addEventListener("click", () => setSourceMode(button.dataset.sourceMode || "saved"));
+      });
+      $("sourceSelect").addEventListener("change", () => {
+        updatePreview(selectedSource());
+        loadCalibrationVersions().catch((error) => setCalibrationStatus(error.message, "bad"));
+      });
+      $("trackerBackend").addEventListener("change", () => updatePreview(selectedSource()));
+      $("startBtn").addEventListener("click", () => startSession().catch((error) => alert(error.message)));
+      $("stopBtn").addEventListener("click", () => stopSession().catch((error) => alert(error.message)));
+      $("refreshSessionsBtn").addEventListener("click", () => loadSessions().catch((error) => alert(error.message)));
+      $("sessionHistoryList").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-open-session-id]");
+        if (button) openHistoricalSession(button.dataset.openSessionId).catch((error) => alert(error.message));
+      });
+      $("uploadBtn").addEventListener("click", () => uploadSource().catch((error) => alert(error.message)));
+      $("guidedUploadBtn").addEventListener("click", () => uploadAndAnalyze().catch((error) => {
+        setGuidedStatus(error.message, "bad");
+        renderGuidedSteps();
+        alert(error.message);
+      }));
+      $("guidedUploadFile").addEventListener("change", () => {
+        const file = $("guidedUploadFile").files[0];
+        if (file && state.sourceMode !== "upload") setSourceMode("upload");
+        setGuidedStatus(file ? `${file.name} selected` : "No upload in progress", file ? "good" : "");
+        previewUploadedFile(file);
+        renderGuidedSteps();
+      });
+      $("liveRtspUrl").addEventListener("input", () => {
+        if (state.sourceMode !== "live") setSourceMode("live");
+        renderGuidedSteps();
+      });
+      $("guidedStoreId").addEventListener("change", () => {
+        state.currentStoreId = $("guidedStoreId").value;
+        populateGuidedCameraSelect();
+        refreshGuidedValidation().catch((error) => setGuidedStatus(error.message, "bad"));
+        loadCalibrationVersions().catch((error) => setCalibrationStatus(error.message, "bad"));
+      });
+      $("guidedCameraId").addEventListener("change", () => {
+        syncGuidedRoleFromCamera();
+        refreshGuidedValidation().catch((error) => setGuidedStatus(error.message, "bad"));
+        loadCalibrationVersions().catch((error) => setCalibrationStatus(error.message, "bad"));
+      });
+      $("guidedCameraRole").addEventListener("change", () => {
+        $("guidedCameraId").value = roleDefaultCamera($("guidedCameraRole").value);
+        refreshGuidedValidation().catch((error) => setGuidedStatus(error.message, "bad"));
+        loadCalibrationVersions().catch((error) => setCalibrationStatus(error.message, "bad"));
+      });
+      $("guidedAnalysisMode").addEventListener("change", () => refreshGuidedValidation().catch((error) => setGuidedStatus(error.message, "bad")));
+      $("extractCalibrationFrameBtn").addEventListener("click", () => extractCalibrationFrame().catch((error) => setCalibrationStatus(error.message, "bad")));
+      $("calibrationCanvas").addEventListener("click", addCalibrationPoint);
+      $("undoCalibrationPointBtn").addEventListener("click", () => {
+        state.calibration.points.pop();
+        drawCalibrationCanvas();
+      });
+      $("clearCalibrationPointsBtn").addEventListener("click", () => {
+        state.calibration.points = [];
+        drawCalibrationCanvas();
+      });
+      $("addCalibrationZoneBtn").addEventListener("click", addCalibrationZone);
+      $("saveCalibrationBtn").addEventListener("click", () => saveCalibration().catch((error) => setCalibrationStatus(error.message, "bad")));
+      $("searchBtn").addEventListener("click", () => searchEvents().catch((error) => alert(error.message)));
+      $("posPreviewBtn").addEventListener("click", () => previewPosUpload().catch((error) => setPosStatus(error.message, "bad")));
+      $("posImportBtn").addEventListener("click", () => importPosUpload().catch((error) => setPosStatus(error.message, "bad")));
+      $("markStaffBtn").addEventListener("click", () => applyStaffCorrection(true).catch((error) => setStaffCorrectionStatus(error.message, "bad")));
+      $("markCustomerBtn").addEventListener("click", () => applyStaffCorrection(false).catch((error) => setStaffCorrectionStatus(error.message, "bad")));
+      $("eventFeed").addEventListener("click", (event) => {
+        const row = event.target.closest("[data-visitor-id]");
+        if (row) loadTimeline(row.dataset.visitorId).catch((error) => alert(error.message));
+      });
+      $("searchResults").addEventListener("click", (event) => {
+        const row = event.target.closest("[data-visitor-id]");
+        if (row) loadTimeline(row.dataset.visitorId).catch((error) => alert(error.message));
+      });
+      $("showAiOverlay").addEventListener("change", drawVideoOverlay);
+      $("showZoneOverlay").addEventListener("change", drawVideoOverlay);
+      $("video").addEventListener("loadedmetadata", () => {
+        syncAnalysisWindowToLoadedVideo();
+        drawVideoOverlay();
+      });
+      $("video").addEventListener("timeupdate", drawVideoOverlay);
+      $("video").addEventListener("seeked", drawVideoOverlay);
+      $("video").addEventListener("play", runOverlayLoop);
+      $("video").addEventListener("pause", drawVideoOverlay);
+      window.addEventListener("resize", drawVideoOverlay);
+      $("rtspBtn").addEventListener("click", () => {
+        const rtsp = $("rtspUrl").value.trim();
+        if (!rtsp) return;
+        updatePreview({media_url: null});
+        startSession({source_id: null, rtsp_url: rtsp}).catch((error) => alert(error.message));
+      });
+    }
+
+    async function init() {
+      bindEvents();
+      await Promise.all([loadSources(), loadStores(), loadQuality(), checkHealth(), loadSessions()]);
+      renderCalibrationZoneList();
+      await loadCalibrationVersions().catch((error) => setCalibrationStatus(error.message, "bad"));
+    }
+
+    init().catch((error) => {
+      setChip("apiChip", "System failed", "bad");
+      $("alerts").innerHTML = `<div class="error-item">${error.message}</div>`;
+    });
+  </script>
+</body>
+</html>

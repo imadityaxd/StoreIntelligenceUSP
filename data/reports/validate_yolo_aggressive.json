@@ -1,0 +1,79 @@
+{
+  "detector": "YOLOv8",
+  "model_path": "D:\\code\\purplletech\\projectXD\\yolov8s.pt",
+  "parameters": {
+    "conf_threshold": 0.3,
+    "iou_threshold": 0.35,
+    "imgsz": 960
+  },
+  "total_frames": 5,
+  "readable_frames": 5,
+  "avg_person_count": 3.2,
+  "zero_detection_frames": [],
+  "manual_review_frames": [
+    "CAM_2_t10s.jpg"
+  ],
+  "frames": [
+    {
+      "frame": "CAM_1_t10s.jpg",
+      "yolo_count": 3,
+      "yolo_confidences": [
+        0.9043,
+        0.8912,
+        0.4853
+      ],
+      "yolo_avg_conf": 0.76,
+      "yolo_min_conf": 0.485,
+      "needs_manual_review": false
+    },
+    {
+      "frame": "CAM_2_t10s.jpg",
+      "yolo_count": 9,
+      "yolo_confidences": [
+        0.9126,
+        0.8915,
+        0.8126,
+        0.685,
+        0.6775,
+        0.5168,
+        0.4254,
+        0.3586,
+        0.3299
+      ],
+      "yolo_avg_conf": 0.623,
+      "yolo_min_conf": 0.33,
+      "needs_manual_review": true
+    },
+    {
+      "frame": "CAM_3_t10s.jpg",
+      "yolo_count": 1,
+      "yolo_confidences": [
+        0.5785
+      ],
+      "yolo_avg_conf": 0.579,
+      "yolo_min_conf": 0.579,
+      "needs_manual_review": false
+    },
+    {
+      "frame": "CAM_4_t10s.jpg",
+      "yolo_count": 1,
+      "yolo_confidences": [
+        0.4172
+      ],
+      "yolo_avg_conf": 0.417,
+      "yolo_min_conf": 0.417,
+      "needs_manual_review": false
+    },
+    {
+      "frame": "CAM_5_t10s.jpg",
+      "yolo_count": 2,
+      "yolo_confidences": [
+        0.9118,
+        0.8039
+      ],
+      "yolo_avg_conf": 0.858,
+      "yolo_min_conf": 0.804,
+      "needs_manual_review": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "evaluation_report": "data\\reports\\tracker_profile_evaluation_CAM_3.json",
+  "profile_path": "D:\\code\\purplletech\\projectXD\\contracts\\tracker_profiles.json",
+  "output_profile_path": "D:\\code\\purplletech\\projectXD\\contracts\\tracker_profiles.json",
+  "applied": false,
+  "min_seconds": 5.0,
+  "min_score_margin": 3.0,
+  "min_assignment_rate": 0.75,
+  "update_count": 1,
+  "recommendations": [
+    {
+      "store_id": "STORE_BLR_002",
+      "camera_id": "CAM_3",
+      "role": "entry",
+      "current_backend": "bytetrack",
+      "recommended_backend": "centroid",
+      "auto_backend": "bytetrack",
+      "auto_matches_recommendation": false,
+      "recommended_score": 46.4,
+      "auto_score": 41.85,
+      "score_margin": 4.55,
+      "assignment_rate": 3.125,
+      "action": "update_tracker_backend",
+      "reasons": []
+    }
+  ]
+}

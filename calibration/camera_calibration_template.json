@@ -1,0 +1,95 @@
+{
+  "source": "Phase 4 reference-frame extraction",
+  "instructions": [
+    "Open calibration/reference_frames/contact_sheet.jpg to identify each camera view.",
+    "Open each full-size reference frame to mark zone polygons.",
+    "Replace placeholder polygons in contracts/store_layout.json after visual calibration.",
+    "Use normalized coordinates: x = pixel_x / frame_width, y = pixel_y / frame_height."
+  ],
+  "cameras": [
+    {
+      "camera_id": "CAM_1",
+      "filename": "CAM 1.mp4",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "fps": 29.97,
+      "duration_seconds": 139.906,
+      "reference_frame": "calibration/reference_frames/CAM_1_t10s.jpg",
+      "role_guess": "sales_floor_top_wall",
+      "zones_to_calibrate": [
+        "TOP_WALL_SKINCARE",
+        "MAKEUP_UNIT",
+        "FOH"
+      ],
+      "notes": "Wide view of skincare/top wall brands and central display. Useful for product-zone visits and dwell."
+    },
+    {
+      "camera_id": "CAM_2",
+      "filename": "CAM 2.mp4",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "fps": 29.97,
+      "duration_seconds": 125.926,
+      "reference_frame": "calibration/reference_frames/CAM_2_t10s.jpg",
+      "role_guess": "sales_floor_bottom_wall",
+      "zones_to_calibrate": [
+        "BOTTOM_WALL_MAKEUP",
+        "ACCESSORIES_PMU",
+        "MAKEUP_UNIT",
+        "FOH"
+      ],
+      "notes": "Wide view of makeup/bottom wall brands and central floor. Useful for product-zone visits and staff/customer movement."
+    },
+    {
+      "camera_id": "CAM_3",
+      "filename": "CAM 3.mp4",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "fps": 29.97,
+      "duration_seconds": 148.015,
+      "reference_frame": "calibration/reference_frames/CAM_3_t10s.jpg",
+      "role_guess": "entry_exit",
+      "zones_to_calibrate": [
+        "ENTRY_EXIT"
+      ],
+      "notes": "Door threshold and mall corridor view. Highest-priority camera for ENTRY, EXIT, and REENTRY events."
+    },
+    {
+      "camera_id": "CAM_4",
+      "filename": "CAM 4.mp4",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "fps": 24.982,
+      "duration_seconds": 145.988,
+      "reference_frame": "calibration/reference_frames/CAM_4_t10s.jpg",
+      "role_guess": "stock_or_staff_area",
+      "zones_to_calibrate": [],
+      "notes": "Back-room/stock style view. Low priority for customer funnel; may help document staff/non-customer area exclusion."
+    },
+    {
+      "camera_id": "CAM_5",
+      "filename": "CAM 5.mp4",
+      "resolution": {
+        "width": 1920,
+        "height": 1080
+      },
+      "fps": 24.981,
+      "duration_seconds": 138.703,
+      "reference_frame": "calibration/reference_frames/CAM_5_t10s.jpg",
+      "role_guess": "billing_counter",
+      "zones_to_calibrate": [
+        "BILLING_COUNTER",
+        "ACCESSORIES_PMU"
+      ],
+      "notes": "Cash counter and checkout area. Highest-priority camera for billing queue and POS correlation."
+    }
+  ]
+}

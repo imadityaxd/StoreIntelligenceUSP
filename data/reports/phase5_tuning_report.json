@@ -1,0 +1,44 @@
+{
+  "input_file": "data\\events_phase5.jsonl",
+  "output_file": "data\\events_phase5_tuned.jsonl",
+  "total_events": 993,
+  "reentry_converted": 0,
+  "abandons_downgraded": 23,
+  "zone_enter_downgraded": 0,
+  "zone_exit_downgraded": 19,
+  "event_counts": {
+    "BILLING_QUEUE_ABANDON": 44,
+    "BILLING_QUEUE_ABANDON_LOW_CONF": 23,
+    "BILLING_QUEUE_JOIN": 86,
+    "ENTRY": 9,
+    "EXIT": 5,
+    "ZONE_DWELL": 5,
+    "ZONE_ENTER": 542,
+    "ZONE_EXIT": 260,
+    "ZONE_EXIT_LOW_CONF": 19
+  },
+  "per_camera_event_counts": {
+    "CAM_1": {
+      "ZONE_DWELL": 3,
+      "ZONE_ENTER": 204,
+      "ZONE_EXIT": 77
+    },
+    "CAM_2": {
+      "ZONE_DWELL": 2,
+      "ZONE_ENTER": 324,
+      "ZONE_EXIT": 181
+    },
+    "CAM_3": {
+      "ENTRY": 9,
+      "EXIT": 5
+    },
+    "CAM_5": {
+      "BILLING_QUEUE_ABANDON": 44,
+      "BILLING_QUEUE_ABANDON_LOW_CONF": 23,
+      "BILLING_QUEUE_JOIN": 86,
+      "ZONE_ENTER": 14,
+      "ZONE_EXIT": 2,
+      "ZONE_EXIT_LOW_CONF": 19
+    }
+  }
+}

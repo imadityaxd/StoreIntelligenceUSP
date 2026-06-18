@@ -1,0 +1,27 @@
+{
+  "timezone": "Asia/Kolkata",
+  "default_reference_second": 10.0,
+  "note": "Reference overlay times were read manually from extracted frame overlays at t=10s.",
+  "cameras": {
+    "CAM_1": {
+      "reference_local": "2026-04-10T20:10:37+05:30",
+      "reference_second": 10.0
+    },
+    "CAM_2": {
+      "reference_local": "2026-04-10T20:10:12+05:30",
+      "reference_second": 10.0
+    },
+    "CAM_3": {
+      "reference_local": "2026-04-10T20:10:05+05:30",
+      "reference_second": 10.0
+    },
+    "CAM_4": {
+      "reference_local": "2026-04-10T20:09:55+05:30",
+      "reference_second": 10.0
+    },
+    "CAM_5": {
+      "reference_local": "2026-04-10T20:09:57+05:30",
+      "reference_second": 10.0
+    }
+  }
+}

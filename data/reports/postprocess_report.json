@@ -1,0 +1,40 @@
+{
+  "input_file": "data\\events_STORE_BLR_002_phase5.jsonl",
+  "output_file": "data\\events_phase5_tuned2.jsonl",
+  "total_events": 250,
+  "reentry_converted": 0,
+  "staff_visitors_flagged": 0,
+  "staff_events_flagged": 0,
+  "abandons_low_confidence": 2,
+  "zone_enter_low_confidence": 0,
+  "zone_exit_low_confidence": 0,
+  "total_low_confidence_events": 2,
+  "event_counts": {
+    "BILLING_QUEUE_ABANDON": 21,
+    "BILLING_QUEUE_JOIN": 23,
+    "ENTRY": 40,
+    "ZONE_DWELL": 13,
+    "ZONE_ENTER": 99,
+    "ZONE_EXIT": 54
+  },
+  "per_camera_event_counts": {
+    "CAM_1": {
+      "ZONE_DWELL": 3,
+      "ZONE_ENTER": 21,
+      "ZONE_EXIT": 9
+    },
+    "CAM_2": {
+      "ZONE_DWELL": 8,
+      "ZONE_ENTER": 78,
+      "ZONE_EXIT": 45
+    },
+    "CAM_3": {
+      "ENTRY": 40
+    },
+    "CAM_5": {
+      "BILLING_QUEUE_ABANDON": 21,
+      "BILLING_QUEUE_JOIN": 23,
+      "ZONE_DWELL": 2
+    }
+  }
+}

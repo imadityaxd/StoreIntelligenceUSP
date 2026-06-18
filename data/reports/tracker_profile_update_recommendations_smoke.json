@@ -1,0 +1,86 @@
+{
+  "evaluation_report": "data\\reports\\tracker_profile_evaluation_smoke.json",
+  "profile_path": "D:\\code\\purplletech\\projectXD\\contracts\\tracker_profiles.json",
+  "output_profile_path": "D:\\code\\purplletech\\projectXD\\contracts\\tracker_profiles.json",
+  "applied": false,
+  "min_seconds": 5.0,
+  "min_score_margin": 3.0,
+  "min_assignment_rate": 0.75,
+  "update_count": 0,
+  "recommendations": [
+    {
+      "store_id": "STORE_BLR_002",
+      "camera_id": "CAM_1",
+      "role": "zone",
+      "current_backend": "bytetrack",
+      "recommended_backend": "bytetrack",
+      "auto_backend": "bytetrack",
+      "auto_matches_recommendation": true,
+      "recommended_score": 82.0,
+      "auto_score": 82.0,
+      "score_margin": 0.0,
+      "assignment_rate": 1.0,
+      "action": "keep",
+      "reasons": [
+        "duration_below_5.0s",
+        "current_backend_already_recommended",
+        "score_margin_too_small"
+      ]
+    },
+    {
+      "store_id": "STORE_BLR_002",
+      "camera_id": "CAM_2",
+      "role": "zone",
+      "current_backend": "bytetrack",
+      "recommended_backend": "bytetrack",
+      "auto_backend": "bytetrack",
+      "auto_matches_recommendation": true,
+      "recommended_score": 76.67,
+      "auto_score": 76.67,
+      "score_margin": 0.0,
+      "assignment_rate": 1.0,
+      "action": "keep",
+      "reasons": [
+        "duration_below_5.0s",
+        "current_backend_already_recommended",
+        "score_margin_too_small"
+      ]
+    },
+    {
+      "store_id": "STORE_BLR_002",
+      "camera_id": "CAM_3",
+      "role": "entry",
+      "current_backend": "bytetrack",
+      "recommended_backend": "centroid",
+      "auto_backend": "bytetrack",
+      "auto_matches_recommendation": false,
+      "recommended_score": 54.0,
+      "auto_score": 47.0,
+      "score_margin": 7.0,
+      "assignment_rate": 1.0,
+      "action": "keep",
+      "reasons": [
+        "duration_below_5.0s"
+      ]
+    },
+    {
+      "store_id": "STORE_BLR_002",
+      "camera_id": "CAM_5",
+      "role": "billing",
+      "current_backend": "botsort",
+      "recommended_backend": "botsort",
+      "auto_backend": "botsort",
+      "auto_matches_recommendation": true,
+      "recommended_score": 58.0,
+      "auto_score": 58.0,
+      "score_margin": 0.0,
+      "assignment_rate": 1.0,
+      "action": "keep",
+      "reasons": [
+        "duration_below_5.0s",
+        "current_backend_already_recommended",
+        "score_margin_too_small"
+      ]
+    }
+  ]
+}

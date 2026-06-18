@@ -1,0 +1,61 @@
+{
+  "input_file": "data\\events_phase5_tuned2.jsonl",
+  "output_file": "data\\events_phase8_submission.jsonl",
+  "total_events": 292,
+  "timestamp_filled": 0,
+  "timestamp_invalid_fixed": 0,
+  "legacy_type_coerced": 0,
+  "queue_downgrade_join_duplicate": 0,
+  "queue_downgrade_abandon_orphan": 0,
+  "queue_downgrade_abandon_rejoin": 1,
+  "queue_downgrade_abandon_extra": 1,
+  "queue_downgrade_abandon_conf_gate": 9,
+  "reentry_converted": 0,
+  "v2_inspired_enrichment": {
+    "added_exit": 40,
+    "added_reentry": 1,
+    "added_billing_alignment": 1,
+    "staff_visitors_flagged": 2
+  },
+  "total_low_confidence_events": 53,
+  "event_counts": {
+    "BILLING_QUEUE_ABANDON": 21,
+    "BILLING_QUEUE_JOIN": 24,
+    "ENTRY": 40,
+    "EXIT": 40,
+    "REENTRY": 1,
+    "ZONE_DWELL": 13,
+    "ZONE_ENTER": 99,
+    "ZONE_EXIT": 54
+  },
+  "per_camera_event_counts": {
+    "CAM_1": {
+      "ZONE_DWELL": 3,
+      "ZONE_ENTER": 21,
+      "ZONE_EXIT": 9
+    },
+    "CAM_2": {
+      "ZONE_DWELL": 8,
+      "ZONE_ENTER": 78,
+      "ZONE_EXIT": 45
+    },
+    "CAM_3": {
+      "ENTRY": 40,
+      "EXIT": 40,
+      "REENTRY": 1
+    },
+    "CAM_5": {
+      "BILLING_QUEUE_ABANDON": 21,
+      "BILLING_QUEUE_JOIN": 24,
+      "ZONE_DWELL": 2
+    }
+  },
+  "readiness": {
+    "timestamps_missing_after_hardening": 0,
+    "strict_abandon_rate": 0.4166666666666667,
+    "strict_abandon_rate_target_le_0_45": true,
+    "reentry_count": 1,
+    "legacy_type_coercions": 0,
+    "total_low_confidence_events": 53
+  }
+}

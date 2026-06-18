@@ -1,0 +1,87 @@
+{
+  "usp_quality_score": 90,
+  "score_breakdown": {
+    "schema_validity": 20,
+    "configured_camera_coverage": 15,
+    "entry_exit_balance": 15,
+    "event_catalogue_coverage": 15,
+    "queue_session_sanity": 15,
+    "pos_matching_signal": 2,
+    "inference_risk_control": 3,
+    "staff_signal": 5
+  },
+  "total_events": 292,
+  "event_counts": {
+    "BILLING_QUEUE_ABANDON": 21,
+    "BILLING_QUEUE_JOIN": 24,
+    "ENTRY": 40,
+    "EXIT": 40,
+    "REENTRY": 1,
+    "ZONE_DWELL": 13,
+    "ZONE_ENTER": 99,
+    "ZONE_EXIT": 54
+  },
+  "per_camera_event_counts": {
+    "CAM_1": {
+      "ZONE_DWELL": 3,
+      "ZONE_ENTER": 21,
+      "ZONE_EXIT": 9
+    },
+    "CAM_2": {
+      "ZONE_DWELL": 8,
+      "ZONE_ENTER": 78,
+      "ZONE_EXIT": 45
+    },
+    "CAM_3": {
+      "ENTRY": 40,
+      "EXIT": 40,
+      "REENTRY": 1
+    },
+    "CAM_5": {
+      "BILLING_QUEUE_ABANDON": 21,
+      "BILLING_QUEUE_JOIN": 24,
+      "ZONE_DWELL": 2
+    }
+  },
+  "configured_cameras": [
+    "CAM_1",
+    "CAM_2",
+    "CAM_3",
+    "CAM_5"
+  ],
+  "covered_configured_cameras": [
+    "CAM_1",
+    "CAM_2",
+    "CAM_3",
+    "CAM_5"
+  ],
+  "schema": {
+    "valid_rows": 292,
+    "invalid_rows": 0,
+    "errors": []
+  },
+  "quality_rates": {
+    "entry_exit_balance": 1.0,
+    "low_confidence_rate": 0.1815,
+    "inferred_event_rate": 0.1712,
+    "pos_match_rate": 0.0417
+  },
+  "signals": {
+    "staff_visitor_count": 2,
+    "pos_matched_transaction_count": 1,
+    "pos_transaction_count": 24,
+    "queue_join_count": 24,
+    "queue_abandon_count": 21
+  },
+  "warnings": [
+    "CAM_4 is not configured in the active layout, so that feed is not scored.",
+    "POS match rate is low; clock sync and billing-zone calibration need review.",
+    "Inferred-event share is high; collect/review ground truth before final USP claims."
+  ],
+  "recommendations": [
+    "Add a human review/annotation loop for false positives and missed visitors.",
+    "Replace centroid association with ByteTrack or BoT-SORT for crowded/occluded scenes.",
+    "Calibrate every camera from sampled frames and keep zone/layout versions.",
+    "Track observed-only metrics separately from LOW-confidence inferred metrics."
+  ]
+}

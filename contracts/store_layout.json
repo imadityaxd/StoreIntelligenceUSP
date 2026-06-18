@@ -1,0 +1,60 @@
+﻿{
+  "store_id": "STORE_BLR_002",
+  "store_name": "Purplle Brigade Road Store 1",
+  "timezone": "Asia/Kolkata",
+  "open_hours": {"open": "10:00", "close": "22:00"},
+  "cameras": [
+    {
+      "camera_id": "CAM_1",
+      "role": "zone",
+      "description": "Zone coverage - left/back wall",
+      "zones_normalized": {
+        "ZONE_BACK_LEFT":  [[0.0,0.0],[0.35,0.0],[0.35,0.6],[0.0,0.6]],
+        "ZONE_BACK_MID":   [[0.35,0.0],[0.65,0.0],[0.65,0.6],[0.35,0.6]],
+        "ZONE_FRONT_LEFT": [[0.0,0.6],[0.45,0.6],[0.45,1.0],[0.0,1.0]],
+        "ZONE_CENTER":     [[0.45,0.3],[0.85,0.3],[0.85,0.85],[0.45,0.85]],
+        "ZONE_FRAGRANCE":  [[0.65,0.0],[1.0,0.0],[1.0,0.5],[0.65,0.5]]
+      }
+    },
+    {
+      "camera_id": "CAM_2",
+      "role": "zone",
+      "description": "Zone coverage - center/right",
+      "zones_normalized": {
+        "ZONE_BACK_RIGHT":  [[0.0,0.0],[0.45,0.0],[0.45,0.55],[0.0,0.55]],
+        "ZONE_BACK_MID":    [[0.45,0.0],[0.75,0.0],[0.75,0.55],[0.45,0.55]],
+        "ZONE_FRONT_MID":   [[0.0,0.55],[0.4,0.55],[0.4,1.0],[0.0,1.0]],
+        "ZONE_FRONT_RIGHT": [[0.4,0.55],[0.75,0.55],[0.75,1.0],[0.4,1.0]],
+        "ZONE_CENTER":      [[0.75,0.2],[1.0,0.2],[1.0,0.8],[0.75,0.8]]
+      }
+    },
+    {
+      "camera_id": "CAM_3",
+      "role": "entry",
+      "description": "Entry/exit threshold",
+      "zones_normalized": {
+        "ENTRY_EXIT": [[0.6,0.0],[1.0,0.0],[1.0,1.0],[0.6,1.0]]
+      }
+    },
+    {
+      "camera_id": "CAM_5",
+      "role": "billing",
+      "description": "Billing counter area",
+      "zones_normalized": {
+        "BILLING_COUNTER": [[0.0,0.0],[1.0,0.0],[1.0,1.0],[0.0,1.0]]
+      }
+    }
+  ],
+  "zones": [
+    {"zone_id": "ENTRY_EXIT",      "label": "Entry/Exit",         "kind": "entry",        "camera_ids": ["CAM_3"], "sku_zone": null},
+    {"zone_id": "ZONE_BACK_LEFT",  "label": "Salm/TFS",           "kind": "product_zone", "camera_ids": ["CAM_1"], "sku_zone": "HAIRCARE"},
+    {"zone_id": "ZONE_BACK_MID",   "label": "Minimalis/Aqualogi", "kind": "product_zone", "camera_ids": ["CAM_1","CAM_2"], "sku_zone": "SKINCARE"},
+    {"zone_id": "ZONE_BACK_RIGHT", "label": "Foxtale/JC",         "kind": "product_zone", "camera_ids": ["CAM_2"], "sku_zone": "SKINCARE"},
+    {"zone_id": "ZONE_FRONT_LEFT", "label": "Faces/La",           "kind": "product_zone", "camera_ids": ["CAM_1"], "sku_zone": "MAKEUP"},
+    {"zone_id": "ZONE_FRONT_MID",  "label": "Mars/NY Bae",        "kind": "product_zone", "camera_ids": ["CAM_2"], "sku_zone": "MAKEUP"},
+    {"zone_id": "ZONE_FRONT_RIGHT","label": "Mens/Loreal/Beauty", "kind": "product_zone", "camera_ids": ["CAM_2"], "sku_zone": "SKINCARE"},
+    {"zone_id": "ZONE_CENTER",     "label": "Makeup Unit/FOH",    "kind": "floor",        "camera_ids": ["CAM_1","CAM_2"], "sku_zone": "MAKEUP"},
+    {"zone_id": "ZONE_FRAGRANCE",  "label": "Fragrance/Nail",     "kind": "product_zone", "camera_ids": ["CAM_1"], "sku_zone": "FRAGRANCE"},
+    {"zone_id": "BILLING_COUNTER", "label": "Cash Counter",       "kind": "billing",      "camera_ids": ["CAM_5"], "sku_zone": null}
+  ]
+}

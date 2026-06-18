@@ -1,0 +1,37 @@
+services:
+  api:
+    build: .
+    container_name: purplle_store_intelligence
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist SQLite DB and generated JSONL files between runs
+      - ./data:/app/data
+      # Keep contracts readable inside the container
+      - ./contracts:/app/contracts:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Override DB path if your app reads this env var; adjust if needed
+      - STORE_DB_PATH=/app/data/store_intelligence.sqlite3
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  dashboard:
+    build: .
+    container_name: purplle_store_dashboard
+    command: ["uvicorn", "dashboard.server:app", "--host", "0.0.0.0", "--port", "8001"]
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./dashboard:/app/dashboard:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - STORE_API_BASE_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped

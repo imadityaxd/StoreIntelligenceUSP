@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+data/*.sqlite3
+data/*.sqlite3-*
+data/dashboard_uploads/
+data/live_sessions/
+data/pipeline_yolo_sample/
+data/events_yolo_sample.jsonl
+data/reports/*.log
+data/reports/*.pid
+events.jsonl
+calibration/reference_frames/*.jpg
+yolov8s.pt

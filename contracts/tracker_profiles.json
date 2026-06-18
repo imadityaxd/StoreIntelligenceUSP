@@ -1,0 +1,106 @@
+{
+  "version_id": "TRACKER_PROFILES_V1",
+  "description": "USP auto-tuning defaults for CCTV person tracking by camera role and store camera.",
+  "default_profile": {
+    "tracker_backend": "bytetrack",
+    "process_fps": 3.0,
+    "yolo_conf": 0.4,
+    "yolo_iou": 0.28,
+    "yolo_imgsz": 960,
+    "min_area": 1300,
+    "max_seconds": 180
+  },
+  "role_profiles": {
+    "entry": {
+      "tracker_backend": "bytetrack",
+      "process_fps": 5.0,
+      "yolo_conf": 0.35,
+      "yolo_iou": 0.28,
+      "min_area": 800
+    },
+    "zone": {
+      "tracker_backend": "bytetrack",
+      "process_fps": 3.0,
+      "yolo_conf": 0.4,
+      "yolo_iou": 0.28,
+      "min_area": 1300
+    },
+    "billing": {
+      "tracker_backend": "botsort",
+      "process_fps": 4.0,
+      "yolo_conf": 0.35,
+      "yolo_iou": 0.35,
+      "min_area": 900
+    },
+    "staff-area": {
+      "tracker_backend": "bytetrack",
+      "process_fps": 2.0,
+      "yolo_conf": 0.45,
+      "yolo_iou": 0.3,
+      "min_area": 1300
+    },
+    "detection_only": {
+      "tracker_backend": "bytetrack",
+      "process_fps": 3.0,
+      "yolo_conf": 0.4,
+      "yolo_iou": 0.28,
+      "min_area": 1300
+    }
+  },
+  "camera_profiles": {
+    "STORE_BLR_002": {
+      "CAM_1": {
+        "profile_name": "store1_zone_left_wall",
+        "process_fps": 3.0,
+        "yolo_conf": 0.4,
+        "min_area": 1200
+      },
+      "CAM_2": {
+        "profile_name": "store1_zone_right_wall",
+        "process_fps": 3.0,
+        "yolo_conf": 0.4,
+        "min_area": 1200
+      },
+      "CAM_3": {
+        "profile_name": "store1_entry_threshold",
+        "tracker_backend": "centroid",
+        "process_fps": 5.0,
+        "yolo_conf": 0.35,
+        "min_area": 700
+      },
+      "CAM_5": {
+        "profile_name": "store1_billing_counter",
+        "tracker_backend": "botsort",
+        "process_fps": 4.0,
+        "yolo_conf": 0.35,
+        "yolo_iou": 0.35,
+        "min_area": 800
+      }
+    },
+    "STORE_BLR_003": {
+      "CAM_1": {
+        "profile_name": "store2_entry_1",
+        "process_fps": 5.0,
+        "min_area": 700
+      },
+      "CAM_2": {
+        "profile_name": "store2_entry_2",
+        "process_fps": 5.0,
+        "min_area": 700
+      },
+      "CAM_3": {
+        "profile_name": "store2_zone_floor",
+        "process_fps": 3.0,
+        "min_area": 1100
+      },
+      "CAM_4": {
+        "profile_name": "store2_billing_area",
+        "tracker_backend": "botsort",
+        "process_fps": 4.0,
+        "yolo_conf": 0.35,
+        "yolo_iou": 0.35,
+        "min_area": 800
+      }
+    }
+  }
+}
