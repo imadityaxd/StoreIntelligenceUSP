@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from pipeline.detect import normalize_tracker_backend
+from pipeline.detect import external_tracker_assignment_decision, normalize_tracker_backend
 from pipeline.overlay import build_overlay_frame
 from pipeline.timebase import load_time_offsets
 from pipeline.tracker import CentroidTracker, Detection, ExternalDetection, ExternalIdTracker, Track
@@ -22,6 +22,40 @@ class Phase9TrackingPersistenceTests(unittest.TestCase):
         self.assertEqual(normalize_tracker_backend("simple"), "centroid")
         with self.assertRaises(ValueError):
             normalize_tracker_backend("unknown")
+
+    def test_external_tracker_allows_id_assignment_warmup(self) -> None:
+        action, streak = external_tracker_assignment_decision(
+            raw_detection_count=2,
+            assigned_detection_count=0,
+            unassigned_streak=0,
+            warmup_samples=5,
+        )
+        self.assertEqual((action, streak), ("warmup", 1))
+
+        action, streak = external_tracker_assignment_decision(
+            raw_detection_count=2,
+            assigned_detection_count=0,
+            unassigned_streak=4,
+            warmup_samples=5,
+        )
+        self.assertEqual((action, streak), ("fallback", 5))
+
+        action, streak = external_tracker_assignment_decision(
+            raw_detection_count=2,
+            assigned_detection_count=1,
+            unassigned_streak=4,
+            warmup_samples=5,
+        )
+        self.assertEqual((action, streak), ("external", 0))
+
+        action, streak = external_tracker_assignment_decision(
+            raw_detection_count=2,
+            assigned_detection_count=0,
+            unassigned_streak=4,
+            has_assigned_ids=True,
+            warmup_samples=5,
+        )
+        self.assertEqual((action, streak), ("external", 0))
 
     def test_tracker_keeps_same_id_through_short_detector_gap(self) -> None:
         tracker = CentroidTracker(max_distance=45, max_missed=4)

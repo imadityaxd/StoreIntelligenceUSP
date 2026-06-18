@@ -37,6 +37,8 @@ class TrackSessionState:
     person_validation: str = "COUNTABLE"
     ignored_reason: str | None = None
     validation_flags: tuple[str, ...] = ()
+    pending_zone: str | None = None
+    pending_zone_samples: int = 0
 
     def __post_init__(self) -> None:
         if self.pending_dwell_milestones is None:
@@ -53,6 +55,7 @@ class EventEmitter:
         time_config: dict[str, Any],
         session_id: str | None = None,
         min_confirmed_hits: int = 3,
+        zone_transition_samples: int = 1,
         abandon_missing_frames: int = 8,
         min_billing_seconds_for_abandon: float = 1.5,
     ) -> None:
@@ -63,6 +66,7 @@ class EventEmitter:
         self.fps = fps
         self.time_config = time_config
         self.min_confirmed_hits = min_confirmed_hits
+        self.zone_transition_samples = max(1, int(zone_transition_samples))
         self.abandon_missing_frames = abandon_missing_frames
         self.min_billing_seconds_for_abandon = min_billing_seconds_for_abandon
         self.states: dict[int, TrackSessionState] = {}
@@ -223,6 +227,21 @@ class EventEmitter:
         target_zone: str | None,
         billing_queue_depth: int,
     ) -> None:
+        if target_zone == state.current_zone:
+            state.pending_zone = None
+            state.pending_zone_samples = 0
+        else:
+            if target_zone != state.pending_zone:
+                state.pending_zone = target_zone
+                state.pending_zone_samples = 1
+            else:
+                state.pending_zone_samples += 1
+
+            if state.pending_zone_samples < self.zone_transition_samples:
+                return
+
+            state.pending_zone = None
+            state.pending_zone_samples = 0
 
         if target_zone != state.current_zone:
             entry_camera = self.camera_config.get("role") in {"entry_exit", "entry"}

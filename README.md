@@ -19,17 +19,7 @@ repository focused on the final USP.
 
 ---
 
-## Live Demo
 
-- API health: `https://store-intelligence-purplle-3ntj.onrender.com/health`
-- API metrics: `https://store-intelligence-purplle-3ntj.onrender.com/stores/STORE_BLR_002/metrics`
-- Dashboard: `https://store-intelligence-purplle-dashboard.onrender.com`
-
-The hosted demo uses the same app path as the local USP. On startup, the API
-idempotently loads the final submission event file and POS CSV when those files
-are present, so the demo store can display without manual database setup.
-
----
 
 ## Quick Start (6 commands)
 
@@ -56,6 +46,22 @@ python -m uvicorn dashboard.server:app --reload --host 127.0.0.1 --port 8001
 ```
 
 Open the dashboard at `http://127.0.0.1:8001`.
+
+Saved CCTV footage is discovered from the project-local media library by
+default:
+
+```text
+StoreIntelligenceMedia\originals\CCTV Footage
+StoreIntelligenceMedia\originals\Store 1
+StoreIntelligenceMedia\originals\Store 2
+```
+
+To keep footage elsewhere, set `STORE_MEDIA_ROOT` before starting the
+dashboard:
+
+```powershell
+$env:STORE_MEDIA_ROOT="D:\StoreIntelligenceMedia"
+```
 
 ---
 
@@ -558,4 +564,3 @@ python -m unittest discover -s tests -p "test_*.py"
 ```
 
 See `docs\RUN_INSTRUCTIONS.md` for the manual smoke test.
-

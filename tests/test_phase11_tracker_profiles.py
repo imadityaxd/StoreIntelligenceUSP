@@ -15,6 +15,12 @@ class Phase11TrackerProfileTests(unittest.TestCase):
         self.assertEqual(profile["process_fps"], 4.0)
         self.assertEqual(profile["min_area"], 800)
 
+    def test_store2_zone_profile_requires_stable_tracks_and_zones(self) -> None:
+        profile = profile_for_camera(store_id="STORE_BLR_003", camera_id="CAM_3", role="zone")
+
+        self.assertEqual(profile["min_confirmed_hits"], 10)
+        self.assertEqual(profile["zone_transition_samples"], 3)
+
     def test_auto_profile_controls_ml_knobs_but_keeps_requested_window(self) -> None:
         resolved = apply_auto_profile(
             store_id="STORE_BLR_002",

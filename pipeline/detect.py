@@ -20,6 +20,7 @@ from pipeline.zones import load_layout
 
 
 TRACKER_BACKENDS = {"auto", "centroid", "bytetrack", "botsort"}
+EXTERNAL_TRACKER_WARMUP_SAMPLES = 5
 
 
 def normalize_tracker_backend(value: str | None) -> str:
@@ -37,6 +38,32 @@ def normalize_tracker_backend(value: str | None) -> str:
     if backend not in TRACKER_BACKENDS:
         raise ValueError(f"Unsupported tracker backend: {value}. Use centroid, bytetrack, or botsort.")
     return backend
+
+
+def external_tracker_assignment_decision(
+    *,
+    raw_detection_count: int,
+    assigned_detection_count: int,
+    unassigned_streak: int,
+    has_assigned_ids: bool = False,
+    warmup_samples: int = EXTERNAL_TRACKER_WARMUP_SAMPLES,
+) -> tuple[str, int]:
+    """Choose whether to keep warming up an external tracker or fall back.
+
+    ByteTrack and BoT-SORT can legitimately return detections without IDs for
+    their first few sampled frames. Falling back on the first such frame
+    disables the configured tracker before it has a chance to confirm tracks.
+    """
+    if assigned_detection_count > 0:
+        return "external", 0
+    if has_assigned_ids:
+        return "external", 0
+    if raw_detection_count == 0:
+        return "external", unassigned_streak
+    next_streak = unassigned_streak + 1
+    if next_streak >= max(1, int(warmup_samples)):
+        return "fallback", next_streak
+    return "warmup", next_streak
 
 
 def run_detection(
@@ -99,10 +126,9 @@ def run_detection(
     max_frames = int(max_seconds * fps) if max_seconds and fps > 0 else None
     capture.release()
 
-    min_confirmed_hits = 3
+    min_confirmed_hits = int(resolved_profile["min_confirmed_hits"])
+    zone_transition_samples = int(resolved_profile["zone_transition_samples"])
     abandon_missing_frames = 8
-    if camera_role == "entry":
-        min_confirmed_hits = 2
     if camera_role == "billing":
         abandon_missing_frames = 14
 
@@ -119,6 +145,7 @@ def run_detection(
         time_config=time_config,
         session_id=session_id,
         min_confirmed_hits=min_confirmed_hits,
+        zone_transition_samples=zone_transition_samples,
         abandon_missing_frames=abandon_missing_frames,
         min_billing_seconds_for_abandon=2.0,
     )
@@ -135,7 +162,8 @@ def run_detection(
     print(
         f"  [YOLO] model={detector.model_path.name} conf={yolo_conf} "
         f"iou={yolo_iou} imgsz={yolo_imgsz} sample_every={sample_every} "
-        f"tracker={requested_tracker_backend} profile={resolved_profile['profile']['profile_name']}"
+        f"tracker={requested_tracker_backend} profile={resolved_profile['profile']['profile_name']} "
+        f"confirm_hits={min_confirmed_hits} zone_samples={zone_transition_samples}"
     )
 
     cap = cv2.VideoCapture(video_source)
@@ -144,6 +172,8 @@ def run_detection(
     overlay_frames = 0
     overlay_tracks = 0
     overlay_handle = None
+    external_unassigned_streak = 0
+    external_tracker_has_assigned_ids = False
     try:
         if overlay_path:
             overlay_path.parent.mkdir(parents=True, exist_ok=True)
@@ -186,10 +216,23 @@ def run_detection(
                     detections.append(detection)
 
             if active_tracker_backend in {"bytetrack", "botsort"}:
-                if tracker_detections or not raw:
+                tracker_action, external_unassigned_streak = external_tracker_assignment_decision(
+                    raw_detection_count=len(raw),
+                    assigned_detection_count=len(tracker_detections),
+                    unassigned_streak=external_unassigned_streak,
+                    has_assigned_ids=external_tracker_has_assigned_ids,
+                )
+                if tracker_detections:
+                    external_tracker_has_assigned_ids = True
+                if tracker_action == "external":
                     tracks, _ended = external_tracker.update(tracker_detections, frame_index)
+                elif tracker_action == "warmup":
+                    tracks, _ended = external_tracker.update([], frame_index)
                 else:
-                    print(f"  [WARN] {active_tracker_backend} returned detections without IDs; using centroid tracking")
+                    print(
+                        f"  [WARN] {active_tracker_backend} returned detections without IDs for "
+                        f"{external_unassigned_streak} sampled frames; using centroid tracking"
+                    )
                     active_tracker_backend = "centroid"
                     tracks, _ended = centroid_tracker.update(detections, frame_index)
             else:
@@ -210,6 +253,7 @@ def run_detection(
                     staff_for_track=emitter.is_staff_track,
                     validation_for_track=emitter.validation_for_track,
                     max_missed=overlay_max_missed,
+                    min_confirmed_hits=min_confirmed_hits,
                 )
                 overlay_frames += 1
                 overlay_tracks += len(overlay_frame["tracks"])

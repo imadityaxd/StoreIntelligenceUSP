@@ -28,9 +28,13 @@ from scripts.import_pos import parse_mapped_csv, parse_purplle_csv
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 DATA_DIR = PROJECT_ROOT / "data"
-UPLOAD_DIR = DATA_DIR / "dashboard_uploads"
+MEDIA_LIBRARY_ROOT = Path(
+    os.getenv("STORE_MEDIA_ROOT", PROJECT_ROOT / "StoreIntelligenceMedia")
+).expanduser().resolve()
+ORIGINAL_MEDIA_DIR = MEDIA_LIBRARY_ROOT / "originals"
+UPLOAD_DIR = MEDIA_LIBRARY_ROOT / "uploads"
 UPLOAD_REGISTRY_PATH = UPLOAD_DIR / "sources.json"
-LIVE_SESSION_DIR = DATA_DIR / "live_sessions"
+LIVE_SESSION_DIR = MEDIA_LIBRARY_ROOT / "sessions"
 CALIBRATION_DIR = DATA_DIR / "calibrations"
 CALIBRATION_FRAME_DIR = CALIBRATION_DIR / "reference_frames"
 CALIBRATION_LAYOUT_DIR = CALIBRATION_DIR / "layouts"
@@ -46,8 +50,7 @@ POLL_SECONDS = float(os.getenv("DASHBOARD_POLL_SECONDS", "1"))
 MAX_UPLOAD_MB = int(os.getenv("DASHBOARD_MAX_UPLOAD_MB", "2048"))
 MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024
 
-PURPLLE_ROOT = Path(r"D:\code\purplletech")
-MEDIA_ROOTS = [PROJECT_ROOT.resolve(), PURPLLE_ROOT.resolve()]
+MEDIA_ROOTS = [PROJECT_ROOT.resolve(), MEDIA_LIBRARY_ROOT]
 LAYOUT_ROOTS = [(PROJECT_ROOT / "contracts").resolve(), CALIBRATION_LAYOUT_DIR.resolve()]
 ALLOWED_VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv"}
 ALLOWED_CAMERA_ROLES = {"zone", "entry", "billing", "staff-area", "detection_only", "uploaded", "live"}
@@ -854,7 +857,7 @@ def known_sources() -> list[dict[str, Any]]:
     store1_layout = DEFAULT_STORE_LAYOUT
     store2_layout = STORE2_LAYOUT
 
-    original_dir = PURPLLE_ROOT / "CCTV Footage-20260529T160731Z-3-00144614ea" / "CCTV Footage"
+    original_dir = ORIGINAL_MEDIA_DIR / "CCTV Footage"
     for idx, role in {
         1: "zone",
         2: "zone",
@@ -864,7 +867,7 @@ def known_sources() -> list[dict[str, Any]]:
     }.items():
         add_source(sources, original_dir / f"CAM {idx}.mp4", "STORE_BLR_002", f"CAM_{idx}", role, store1_layout)
 
-    renamed_dir = PURPLLE_ROOT / "Store 1-20260602T101818Z-3-001ec38db8" / "Store 1"
+    renamed_dir = ORIGINAL_MEDIA_DIR / "Store 1"
     for filename, camera_id, role in [
         ("CAM 1 - zone.mp4", "CAM_1", "zone"),
         ("CAM 2 - zone.mp4", "CAM_2", "zone"),
@@ -873,7 +876,7 @@ def known_sources() -> list[dict[str, Any]]:
     ]:
         add_source(sources, renamed_dir / filename, "STORE_BLR_002", camera_id, role, store1_layout)
 
-    store2_dir = PURPLLE_ROOT / "Store 2-20260602T101819Z-3-001099f208" / "Store 2"
+    store2_dir = ORIGINAL_MEDIA_DIR / "Store 2"
     for filename, camera_id, role in [
         ("entry 1.mp4", "CAM_1", "entry"),
         ("entry 2.mp4", "CAM_2", "entry"),
@@ -1181,12 +1184,24 @@ def overlay_payload_for_session(session: dict[str, Any], limit: int = 5000) -> d
         for track in frame.get("tracks", [])
         if track.get("countable", True) and (track.get("visitor_id") or track.get("track_id") is not None)
     }
-    suspect_ids = {
+    ever_suspect_ids = {
         track.get("visitor_id") or str(track.get("track_id"))
         for frame in frames
         for track in frame.get("tracks", [])
         if track.get("countable") is False and (track.get("visitor_id") or track.get("track_id") is not None)
     }
+    suspect_ids = ever_suspect_ids - countable_ids
+    events_path_value = session.get("events_path")
+    if not events_path_value and session.get("session_id"):
+        candidate = LIVE_SESSION_DIR / str(session["session_id"]) / "events.jsonl"
+        events_path_value = str(candidate) if candidate.exists() else None
+    event_rows = read_events(Path(events_path_value)) if events_path_value else []
+    counted_visitor_ids = {
+        event.get("visitor_id")
+        for event in event_rows
+        if event.get("visitor_id") and not event.get("is_staff", False)
+    }
+    overlay_only_countable_ids = countable_ids - counted_visitor_ids
     frame_width = next((frame.get("frame_width") for frame in frames if frame.get("frame_width")), None)
     frame_height = next((frame.get("frame_height") for frame in frames if frame.get("frame_height")), None)
     video_times = [
@@ -1214,7 +1229,10 @@ def overlay_payload_for_session(session: dict[str, Any], limit: int = 5000) -> d
         "staff_track_count": len(staff_ids),
         "person_track_count": len(countable_ids),
         "valid_person_track_count": len(countable_ids),
+        "counted_person_track_count": len(counted_visitor_ids),
+        "overlay_only_countable_track_count": len(overlay_only_countable_ids),
         "suspect_track_count": len(suspect_ids),
+        "transient_track_count": len(ever_suspect_ids & countable_ids),
         "frame_width": frame_width,
         "frame_height": frame_height,
         "first_video_time_seconds": first_video_time,

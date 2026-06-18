@@ -119,6 +119,85 @@ class Phase16PhysicalPersonValidationTests(unittest.TestCase):
         self.assertEqual(by_id[2]["person_type"], "suspect")
         self.assertEqual(by_id[2]["ignored_reason"], "REFLECTION_OR_FALSE_PERSON_SUSPECT")
 
+    def test_zone_camera_rejects_short_tracks_until_confirmation_threshold(self) -> None:
+        camera = {
+            "camera_id": "CAM_TEST",
+            "role": "zone",
+            "zones_normalized": {"ZONE_MAIN": [[0, 0], [1, 0], [1, 1], [0, 1]]},
+        }
+        emitter = EventEmitter(
+            "STORE_TEST",
+            "CAM_TEST",
+            camera,
+            fps=3.0,
+            time_config=TIME_CONFIG,
+            min_confirmed_hits=10,
+        )
+        short_track = stable_person(1)
+        short_track.hits = 9
+
+        emitter.process_tracks([short_track], frame_index=9, frame_w=1920, frame_h=1080)
+
+        self.assertEqual(emitter.finish(), [])
+
+    def test_overlay_uses_camera_confirmation_threshold_for_unvalidated_tracks(self) -> None:
+        camera = {
+            "camera_id": "CAM_TEST",
+            "role": "zone",
+            "zones_normalized": {"ZONE_MAIN": [[0, 0], [1, 0], [1, 1], [0, 1]]},
+        }
+        short_track = stable_person(1)
+        short_track.hits = 9
+
+        frame = build_overlay_frame(
+            session_id="SESSION_STRICT_CONFIRMATION",
+            camera_id="CAM_TEST",
+            camera_config=camera,
+            time_config=TIME_CONFIG,
+            frame_index=10,
+            fps=3.0,
+            frame_width=1920,
+            frame_height=1080,
+            tracks=[short_track],
+            min_confirmed_hits=10,
+        )
+
+        self.assertFalse(frame["tracks"][0]["countable"])
+        self.assertEqual(frame["tracks"][0]["person_type"], "suspect")
+
+    def test_zone_transition_requires_consecutive_stable_samples(self) -> None:
+        camera = {
+            "camera_id": "CAM_TEST",
+            "role": "zone",
+            "zones_normalized": {
+                "ZONE_LEFT": [[0, 0], [0.5, 0], [0.5, 1], [0, 1]],
+                "ZONE_RIGHT": [[0.5, 0], [1, 0], [1, 1], [0.5, 1]],
+            },
+        }
+        emitter = EventEmitter(
+            "STORE_TEST",
+            "CAM_TEST",
+            camera,
+            fps=3.0,
+            time_config=TIME_CONFIG,
+            min_confirmed_hits=3,
+            zone_transition_samples=3,
+        )
+        track = stable_person(1)
+        track.detection = Detection(x=200, y=360, w=170, h=420, confidence=0.86)
+
+        for frame_index in range(3):
+            emitter.process_tracks([track], frame_index=frame_index, frame_w=1920, frame_h=1080)
+
+        track.detection = Detection(x=1200, y=360, w=170, h=420, confidence=0.86)
+        emitter.process_tracks([track], frame_index=3, frame_w=1920, frame_h=1080)
+        track.detection = Detection(x=200, y=360, w=170, h=420, confidence=0.86)
+        emitter.process_tracks([track], frame_index=4, frame_w=1920, frame_h=1080)
+
+        events = emitter.finish()
+        self.assertEqual([event["event_type"] for event in events], ["ZONE_ENTER"])
+        self.assertEqual(events[0]["zone_id"], "ZONE_LEFT")
+
 
 if __name__ == "__main__":
     unittest.main()
