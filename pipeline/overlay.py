@@ -34,6 +34,7 @@ def track_to_overlay(
     visitor_id_for_track: Callable[[int], str] | None = None,
     staff_for_track: Callable[[int, str | None], bool] | None = None,
     validation_for_track: Callable[[int], Any | None] | None = None,
+    min_confirmed_hits: int = 3,
 ) -> dict[str, Any] | None:
     x1 = _clamp(track.detection.x, 0, frame_width)
     y1 = _clamp(track.detection.y, 0, frame_height)
@@ -48,7 +49,12 @@ def track_to_overlay(
     is_staff = bool(staff_for_track(track.track_id, zone_id)) if staff_for_track else False
     validation = validation_for_track(track.track_id) if validation_for_track else None
     if validation is None:
-        validation = validate_physical_person_track(track, frame_width, frame_height, min_confirmed_hits=3)
+        validation = validate_physical_person_track(
+            track,
+            frame_width,
+            frame_height,
+            min_confirmed_hits=min_confirmed_hits,
+        )
     countable = True if validation is None else bool(getattr(validation, "countable", True))
     ignored_reason = None if validation is None else getattr(validation, "ignored_reason", None)
     physical_person_score = None if validation is None else getattr(validation, "physical_person_score", None)
@@ -99,6 +105,7 @@ def build_overlay_frame(
     staff_for_track: Callable[[int, str | None], bool] | None = None,
     validation_for_track: Callable[[int], Any | None] | None = None,
     max_missed: int = 8,
+    min_confirmed_hits: int = 3,
 ) -> dict[str, Any]:
     visible_tracks = [
         track
@@ -115,6 +122,7 @@ def build_overlay_frame(
             visitor_id_for_track=visitor_id_for_track,
             staff_for_track=staff_for_track,
             validation_for_track=validation_for_track,
+            min_confirmed_hits=min_confirmed_hits,
         )
         if row is None:
             continue

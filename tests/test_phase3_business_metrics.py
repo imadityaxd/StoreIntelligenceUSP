@@ -188,7 +188,41 @@ class Phase3BusinessMetricTests(unittest.TestCase):
         self.assertTrue(any(item["type"] == "BILLING_QUEUE_SPIKE" for item in anomalies))
         self.assertTrue(any(item["type"] == "LOW_DATA_CONFIDENCE" for item in anomalies))
 
+    def test_zone_only_session_does_not_emit_conversion_warning(self) -> None:
+        events = [
+            make_event(
+                f"VIS_{idx}",
+                "ZONE_ENTER",
+                f"2026-04-10T07:{idx:02d}:00Z",
+                zone_id="ZONE_BACK_LEFT",
+                session_seq=1,
+            )
+            for idx in range(6)
+        ]
+
+        anomalies = compute_anomalies(events, [], self.layout)
+
+        self.assertNotIn("CONVERSION_DROP", {item["type"] for item in anomalies})
+        self.assertNotIn("LOW_BASELINE_CONFIDENCE", {item["type"] for item in anomalies})
+
+    def test_inactive_zones_are_scoped_to_observed_camera_and_collapsed(self) -> None:
+        events = [
+            make_event(
+                "VIS_1",
+                "ZONE_ENTER",
+                "2026-04-10T07:00:00Z",
+                zone_id="ZONE_BACK_LEFT",
+                session_seq=1,
+            )
+        ]
+
+        anomalies = compute_anomalies(events, [], self.layout)
+        dead_zone_rows = [item for item in anomalies if item["type"] == "DEAD_ZONES_SUMMARY"]
+
+        self.assertEqual(len(dead_zone_rows), 1)
+        self.assertNotIn("ZONE_BACK_RIGHT", dead_zone_rows[0]["zone_ids"])
+        self.assertNotIn("ZONE_FRONT_RIGHT", dead_zone_rows[0]["zone_ids"])
+
 
 if __name__ == "__main__":
     unittest.main()
-

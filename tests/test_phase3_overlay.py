@@ -108,6 +108,7 @@ class Phase3OverlayTests(unittest.TestCase):
     def test_dashboard_overlay_payload_includes_geometry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             overlay_path = Path(tmp) / "overlays.jsonl"
+            events_path = Path(tmp) / "events.jsonl"
             rows = [
                 {
                     "session_id": "SESSION_DASH",
@@ -135,10 +136,21 @@ class Phase3OverlayTests(unittest.TestCase):
                 "".join(json.dumps(row) + "\n" for row in rows),
                 encoding="utf-8",
             )
+            events_path.write_text(
+                json.dumps(
+                    {
+                        "visitor_id": "VIS_1",
+                        "is_staff": False,
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
             session = {
                 "session_id": "SESSION_DASH",
                 "camera_id": "CAM_1",
                 "overlay_path": str(overlay_path),
+                "events_path": str(events_path),
                 "source": {"layout_path": str(self.layout_path), "camera_id": "CAM_1"},
             }
 
@@ -150,6 +162,8 @@ class Phase3OverlayTests(unittest.TestCase):
         self.assertEqual(payload["unique_track_count"], 2)
         self.assertEqual(payload["person_track_count"], 2)
         self.assertEqual(payload["valid_person_track_count"], 2)
+        self.assertEqual(payload["counted_person_track_count"], 1)
+        self.assertEqual(payload["overlay_only_countable_track_count"], 1)
         self.assertEqual(payload["suspect_track_count"], 0)
         self.assertEqual(payload["staff_track_count"], 1)
         self.assertEqual(payload["first_video_time_seconds"], 0.0)

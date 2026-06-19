@@ -8,7 +8,9 @@
     "yolo_iou": 0.28,
     "yolo_imgsz": 960,
     "min_area": 1300,
-    "max_seconds": 180
+    "max_seconds": 180,
+    "min_confirmed_hits": 3,
+    "zone_transition_samples": 1
   },
   "role_profiles": {
     "entry": {
@@ -16,35 +18,42 @@
       "process_fps": 5.0,
       "yolo_conf": 0.35,
       "yolo_iou": 0.28,
-      "min_area": 800
+      "min_area": 800,
+      "min_confirmed_hits": 2
     },
     "zone": {
       "tracker_backend": "bytetrack",
       "process_fps": 3.0,
       "yolo_conf": 0.4,
       "yolo_iou": 0.28,
-      "min_area": 1300
+      "min_area": 1300,
+      "min_confirmed_hits": 8,
+      "zone_transition_samples": 3
     },
     "billing": {
       "tracker_backend": "botsort",
       "process_fps": 4.0,
       "yolo_conf": 0.35,
       "yolo_iou": 0.35,
-      "min_area": 900
+      "min_area": 900,
+      "min_confirmed_hits": 4,
+      "zone_transition_samples": 2
     },
     "staff-area": {
       "tracker_backend": "bytetrack",
       "process_fps": 2.0,
       "yolo_conf": 0.45,
       "yolo_iou": 0.3,
-      "min_area": 1300
+      "min_area": 1300,
+      "min_confirmed_hits": 6
     },
     "detection_only": {
       "tracker_backend": "bytetrack",
       "process_fps": 3.0,
       "yolo_conf": 0.4,
       "yolo_iou": 0.28,
-      "min_area": 1300
+      "min_area": 1300,
+      "min_confirmed_hits": 6
     }
   },
   "camera_profiles": {
@@ -91,7 +100,9 @@
       "CAM_3": {
         "profile_name": "store2_zone_floor",
         "process_fps": 3.0,
-        "min_area": 1100
+        "min_area": 1100,
+        "min_confirmed_hits": 10,
+        "zone_transition_samples": 3
       },
       "CAM_4": {
         "profile_name": "store2_billing_area",

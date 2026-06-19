@@ -57,6 +57,8 @@ def load_tracker_profiles(path: Path | None = None) -> dict[str, Any]:
                 "yolo_imgsz": 960,
                 "min_area": 1300,
                 "max_seconds": 180,
+                "min_confirmed_hits": 3,
+                "zone_transition_samples": 1,
             },
             "role_profiles": {},
             "camera_profiles": {},
@@ -74,6 +76,8 @@ def clean_tracker_profile(profile: dict[str, Any]) -> dict[str, Any]:
         "yolo_imgsz": _as_int(profile.get("yolo_imgsz"), 960, 320, 1920),
         "min_area": _as_int(profile.get("min_area"), 1300, 100, 100_000),
         "max_seconds": _as_float(profile.get("max_seconds"), 180.0, 3.0, 900.0),
+        "min_confirmed_hits": _as_int(profile.get("min_confirmed_hits"), 3, 1, 30),
+        "zone_transition_samples": _as_int(profile.get("zone_transition_samples"), 1, 1, 12),
     }
 
 
@@ -132,6 +136,8 @@ def apply_auto_profile(
         "yolo_imgsz": profile["yolo_imgsz"] if auto_tracker or yolo_imgsz is None else _as_int(yolo_imgsz, profile["yolo_imgsz"], 320, 1920),
         "min_area": profile["min_area"] if auto_tracker or min_area is None else _as_int(min_area, profile["min_area"], 100, 100_000),
         "max_seconds": profile["max_seconds"] if max_seconds is None else _as_float(max_seconds, profile["max_seconds"], 3.0, 900.0),
+        "min_confirmed_hits": profile["min_confirmed_hits"],
+        "zone_transition_samples": profile["zone_transition_samples"],
         "auto_profile_applied": auto_tracker,
     }
     return resolved

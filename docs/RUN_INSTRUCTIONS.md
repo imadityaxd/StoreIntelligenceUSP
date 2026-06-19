@@ -47,6 +47,25 @@ Use this path:
 cd D:\code\purplletech\projectXD
 ```
 
+Saved CCTV footage is discovered under:
+
+```text
+StoreIntelligenceMedia\originals
+```
+
+The current project-local path is:
+
+```text
+D:\Code\StoreIntelligenceUSP-main\StoreIntelligenceMedia\originals
+```
+
+For an external media disk or directory, set the root before starting the
+dashboard:
+
+```powershell
+$env:STORE_MEDIA_ROOT="D:\StoreIntelligenceMedia"
+```
+
 ---
 
 ## 3. First-Time Setup

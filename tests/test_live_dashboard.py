@@ -122,7 +122,21 @@ class LiveDashboardTests(unittest.TestCase):
         )
 
     def test_dashboard_discovers_known_cctv_sources(self) -> None:
-        sources = known_sources()
+        original_media_dir = dashboard_server.ORIGINAL_MEDIA_DIR
+        original_media_roots = list(dashboard_server.MEDIA_ROOTS)
+        with tempfile.TemporaryDirectory() as tmp:
+            media_root = Path(tmp)
+            store1_dir = media_root / "Store 1"
+            store1_dir.mkdir(parents=True)
+            (store1_dir / "CAM 5 - billing.mp4").write_bytes(b"test video")
+            dashboard_server.ORIGINAL_MEDIA_DIR = media_root
+            dashboard_server.MEDIA_ROOTS = [*original_media_roots, media_root.resolve()]
+            try:
+                sources = known_sources()
+            finally:
+                dashboard_server.ORIGINAL_MEDIA_DIR = original_media_dir
+                dashboard_server.MEDIA_ROOTS = original_media_roots
+
         camera_roles = {(source["store_id"], source["camera_id"], source["role"]) for source in sources}
 
         self.assertIn(("STORE_BLR_002", "CAM_5", "billing"), camera_roles)
@@ -207,8 +221,21 @@ class LiveDashboardTests(unittest.TestCase):
         self.assertIn("limit=12", calls[0])
 
     def test_saved_source_keeps_configured_store_context(self) -> None:
-        source = next(item for item in known_sources() if item["store_id"] == "STORE_BLR_002")
-        resolved = resolve_source(LiveSessionRequest(source_id=source["source_id"]))
+        original_media_dir = dashboard_server.ORIGINAL_MEDIA_DIR
+        original_media_roots = list(dashboard_server.MEDIA_ROOTS)
+        with tempfile.TemporaryDirectory() as tmp:
+            media_root = Path(tmp)
+            store1_dir = media_root / "Store 1"
+            store1_dir.mkdir(parents=True)
+            (store1_dir / "CAM 1 - zone.mp4").write_bytes(b"test video")
+            dashboard_server.ORIGINAL_MEDIA_DIR = media_root
+            dashboard_server.MEDIA_ROOTS = [*original_media_roots, media_root.resolve()]
+            try:
+                source = next(item for item in known_sources() if item["store_id"] == "STORE_BLR_002")
+                resolved = resolve_source(LiveSessionRequest(source_id=source["source_id"]))
+            finally:
+                dashboard_server.ORIGINAL_MEDIA_DIR = original_media_dir
+                dashboard_server.MEDIA_ROOTS = original_media_roots
 
         self.assertEqual(resolved["store_id"], "STORE_BLR_002")
 

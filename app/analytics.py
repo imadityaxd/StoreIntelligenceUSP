@@ -432,6 +432,16 @@ def compute_anomalies(events: list[dict], pos_transactions: list[dict], layout: 
     anomalies: list[dict] = []
     metrics = compute_metrics(events, pos_transactions, layout)
     latest_event_ts = max(parse_ts(event["timestamp"]) for event in events)
+    camera_roles = {
+        camera.get("camera_id"): camera.get("role")
+        for camera in layout.get("cameras", [])
+        if camera.get("camera_id")
+    }
+    observed_camera_ids = {
+        event.get("camera_id")
+        for event in events
+        if event.get("camera_id")
+    }
 
     # -- Billing queue spike --------------------------------------------------
     if metrics["queue"]["latest_depth"] >= 8:
@@ -455,75 +465,84 @@ def compute_anomalies(events: list[dict], pos_transactions: list[dict], layout: 
     # Try to build a rolling baseline. If insufficient history exists, fall
     # back gracefully with a low-confidence note instead of silently comparing
     # against a hardcoded 20% threshold that may not fit this store.
-    baseline = _estimate_baseline_conversion(events, pos_transactions)
-    current_rate = metrics["conversion_rate"]
+    has_billing_evidence = any(
+        event.get("event_type") in {"BILLING_QUEUE_JOIN", "BILLING_QUEUE_ABANDON"}
+        or event.get("zone_id") == "BILLING_COUNTER"
+        or camera_roles.get(event.get("camera_id")) in {"billing", "billing_counter"}
+        for event in events
+    )
+    conversion_supported = bool(pos_transactions) or has_billing_evidence
+    if conversion_supported:
+        baseline = _estimate_baseline_conversion(events, pos_transactions)
+        current_rate = metrics["conversion_rate"]
 
-    if not baseline["has_baseline"]:
-        # No baseline available - use static threshold but flag low confidence
-        if metrics["unique_visitors"] >= 5 and current_rate < 0.2:
-            anomalies.append(
-                {
-                    "type": "CONVERSION_DROP",
-                    "severity": "WARN",
-                    "baseline_confidence": "LOW",
-                    "baseline_note": baseline["note"],
-                    "current_conversion_rate": current_rate,
-                    "threshold_used": 0.2,
-                    "message": (
-                        f"Conversion rate {current_rate:.1%} is below the 20% static threshold. "
-                        f"Note: {baseline['note']}"
-                    ),
-                    "suggested_action": (
-                        "Treat as indicative only - no historical baseline available. "
-                        "Check staff availability and billing wait times."
-                    ),
-                }
-            )
-        elif metrics["unique_visitors"] >= 5:
-            # Enough visitors but rate is OK - still note missing baseline
-            anomalies.append(
-                {
-                    "type": "LOW_BASELINE_CONFIDENCE",
-                    "severity": "INFO",
-                    "baseline_note": baseline["note"],
-                    "current_conversion_rate": current_rate,
-                    "message": baseline["note"],
-                    "suggested_action": (
-                        "Ingest more days of data to enable baseline-relative anomaly detection."
-                    ),
-                }
-            )
-    else:
-        # We have a baseline - flag if current rate drops more than 30% relative
-        baseline_rate = baseline["baseline_conversion_rate"]
-        drop_threshold = 0.30  # 30% relative drop triggers anomaly
-        relative_drop = (baseline_rate - current_rate) / baseline_rate if baseline_rate > 0 else 0.0
+        if not baseline["has_baseline"]:
+            if metrics["unique_visitors"] >= 5 and current_rate < 0.2:
+                anomalies.append(
+                    {
+                        "type": "CONVERSION_DROP",
+                        "severity": "WARN",
+                        "baseline_confidence": "LOW",
+                        "baseline_note": baseline["note"],
+                        "current_conversion_rate": current_rate,
+                        "threshold_used": 0.2,
+                        "message": (
+                            f"Conversion rate {current_rate:.1%} is below the 20% static threshold. "
+                            f"Note: {baseline['note']}"
+                        ),
+                        "suggested_action": (
+                            "Treat as indicative only - no historical baseline available. "
+                            "Check staff availability and billing wait times."
+                        ),
+                    }
+                )
+            elif metrics["unique_visitors"] >= 5:
+                anomalies.append(
+                    {
+                        "type": "LOW_BASELINE_CONFIDENCE",
+                        "severity": "INFO",
+                        "baseline_note": baseline["note"],
+                        "current_conversion_rate": current_rate,
+                        "message": baseline["note"],
+                        "suggested_action": (
+                            "Ingest more days of data to enable baseline-relative anomaly detection."
+                        ),
+                    }
+                )
+        else:
+            baseline_rate = baseline["baseline_conversion_rate"]
+            drop_threshold = 0.30
+            relative_drop = (baseline_rate - current_rate) / baseline_rate if baseline_rate > 0 else 0.0
 
-        if metrics["unique_visitors"] >= 5 and relative_drop >= drop_threshold:
-            anomalies.append(
-                {
-                    "type": "CONVERSION_DROP",
-                    "severity": "WARN",
-                    "baseline_confidence": "HIGH",
-                    "baseline_note": baseline["note"],
-                    "baseline_conversion_rate": baseline_rate,
-                    "current_conversion_rate": current_rate,
-                    "relative_drop_pct": round(relative_drop * 100, 1),
-                    "message": (
-                        f"Conversion rate {current_rate:.1%} is {relative_drop:.0%} below "
-                        f"the {baseline['days_of_data']}-day baseline of {baseline_rate:.1%}."
-                    ),
-                    "suggested_action": (
-                        "Review billing counter staffing and recent merchandising changes."
-                    ),
-                }
-            )
+            if metrics["unique_visitors"] >= 5 and relative_drop >= drop_threshold:
+                anomalies.append(
+                    {
+                        "type": "CONVERSION_DROP",
+                        "severity": "WARN",
+                        "baseline_confidence": "HIGH",
+                        "baseline_note": baseline["note"],
+                        "baseline_conversion_rate": baseline_rate,
+                        "current_conversion_rate": current_rate,
+                        "relative_drop_pct": round(relative_drop * 100, 1),
+                        "message": (
+                            f"Conversion rate {current_rate:.1%} is {relative_drop:.0%} below "
+                            f"the {baseline['days_of_data']}-day baseline of {baseline_rate:.1%}."
+                        ),
+                        "suggested_action": (
+                            "Review billing counter staffing and recent merchandising changes."
+                        ),
+                    }
+                )
 
     # -- Dead zone detection --------------------------------------------------
-    product_zone_ids = [
-        zone["zone_id"]
+    monitored_zones = [
+        zone
         for zone in layout.get("zones", [])
         if zone.get("kind") in {"product_zone", "floor"}
+        and (
+            not zone.get("camera_ids")
+            or bool(observed_camera_ids.intersection(zone.get("camera_ids") or []))
+        )
     ]
     recent_cutoff = latest_event_ts - timedelta(minutes=30)
     recent_zone_visits = {
@@ -531,17 +550,26 @@ def compute_anomalies(events: list[dict], pos_transactions: list[dict], layout: 
         for event in customer_events(events)
         if event.get("zone_id") and parse_ts(event["timestamp"]) >= recent_cutoff
     }
-    for zone_id in product_zone_ids:
-        if zone_id not in recent_zone_visits:
-            anomalies.append(
-                {
-                    "type": "DEAD_ZONE",
-                    "severity": "INFO",
-                    "zone_id": zone_id,
-                    "message": f"No customer visit observed in {zone_id} during the last 30 event-minutes.",
-                    "suggested_action": "Review camera coverage first, then check merchandising or staff guidance.",
-                }
-            )
+    inactive_zones = [
+        zone for zone in monitored_zones
+        if zone.get("zone_id") not in recent_zone_visits
+    ]
+    if inactive_zones:
+        labels = [zone.get("label") or zone.get("zone_id") for zone in inactive_zones]
+        if len(labels) == 1:
+            message = f"No visits were detected in {labels[0]} during this session."
+        else:
+            message = f"No visits were detected in {len(labels)} monitored zones: {', '.join(labels)}."
+        anomalies.append(
+            {
+                "type": "DEAD_ZONES_SUMMARY",
+                "severity": "INFO",
+                "zone_ids": [zone.get("zone_id") for zone in inactive_zones],
+                "zone_count": len(inactive_zones),
+                "message": message,
+                "suggested_action": "If this is unexpected, review camera coverage and zone calibration.",
+            }
+        )
 
     # -- Low data confidence --------------------------------------------------
     if metrics["data_confidence"] == "LOW":

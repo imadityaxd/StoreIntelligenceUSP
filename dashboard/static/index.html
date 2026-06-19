@@ -806,19 +806,63 @@
       overflow: auto;
     }
 
-    .error-list {
+    .alert-list {
       display: grid;
       gap: 8px;
     }
 
-    .error-item {
-      padding: 9px;
+    .alert-item {
+      padding: 10px;
       border-radius: 8px;
-      border: 1px solid rgba(239, 107, 107, 0.4);
-      color: #ffc6c6;
-      background: rgba(239, 107, 107, 0.08);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.025);
       font-size: 12px;
     }
+
+    .alert-item.critical {
+      border-color: rgba(239, 107, 107, 0.55);
+      background: rgba(239, 107, 107, 0.09);
+    }
+
+    .alert-item.warning {
+      border-color: rgba(242, 185, 75, 0.5);
+      background: rgba(242, 185, 75, 0.08);
+    }
+
+    .alert-item.info {
+      border-color: rgba(86, 164, 255, 0.45);
+      background: rgba(86, 164, 255, 0.07);
+    }
+
+    .alert-item.success {
+      border-color: rgba(80, 210, 135, 0.45);
+      background: rgba(80, 210, 135, 0.07);
+    }
+
+    .alert-heading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .alert-badge {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid currentColor;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .alert-item.critical .alert-badge { color: #ffc6c6; }
+    .alert-item.warning .alert-badge { color: #ffd98a; }
+    .alert-item.info .alert-badge { color: #a9d1ff; }
+    .alert-item.success .alert-badge { color: #9aefbd; }
+
+    .alert-message { color: var(--text); line-height: 1.35; }
+    .alert-action { color: var(--muted); margin-top: 5px; line-height: 1.35; }
 
     @media (max-width: 1160px) {
       .workspace { grid-template-columns: 1fr; }
@@ -1009,8 +1053,8 @@
 
           <section class="stack">
             <section class="panel">
-              <div class="panel-header"><h2>Alerts</h2></div>
-              <div class="panel-body"><div id="alerts" class="error-list"><div class="tiny">No active alerts</div></div></div>
+              <div class="panel-header"><h2>Insights &amp; Alerts</h2><span id="alertSummary" class="tiny">No critical alerts</span></div>
+              <div class="panel-body"><div id="alerts" class="alert-list"><div class="tiny">No active alerts or insights</div></div></div>
             </section>
 
             <section class="panel">
@@ -1879,13 +1923,22 @@
         state.overlayLastSecond = payload.last_video_time_seconds ?? null;
         state.overlayReady = Boolean(payload.available);
         if (payload.available) {
-          const people = payload.valid_person_track_count ?? payload.person_track_count ?? payload.unique_track_count ?? 0;
+          const countedPeople = payload.counted_person_track_count
+            ?? state.latestSnapshot?.metrics?.unique_visitors
+            ?? 0;
+          const overlayTracks = payload.valid_person_track_count
+            ?? payload.person_track_count
+            ?? payload.unique_track_count
+            ?? 0;
+          const overlayOnly = payload.overlay_only_countable_track_count
+            ?? Math.max(0, overlayTracks - countedPeople);
           const suspect = payload.suspect_track_count || 0;
           const samples = payload.frame_count || 0;
-          const label = suspect
-            ? `${people} valid people (${suspect} suspect)`
-            : `${people} valid people`;
-          state.overlaySummaryLabel = `${label} - ${samples} sampled frames`;
+          const diagnostics = [];
+          if (overlayOnly) diagnostics.push(`${overlayOnly} overlay-only`);
+          if (suspect) diagnostics.push(`${suspect} rejected`);
+          const detail = diagnostics.length ? ` (${diagnostics.join(", ")})` : "";
+          state.overlaySummaryLabel = `${countedPeople} counted people${detail} - ${samples} sampled frames`;
           setOverlayChip(state.overlaySummaryLabel, "good");
         } else if (status === "error" || session.overlay_status === "failed") {
           state.overlaySummaryLabel = "AI overlay failed";
@@ -2511,17 +2564,77 @@
       await loadPosMatches().catch(() => {});
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function alertTitle(type, severity) {
+      const titles = {
+        BILLING_QUEUE_SPIKE: "Billing queue pressure",
+        CONVERSION_DROP: "Conversion needs attention",
+        LOW_BASELINE_CONFIDENCE: "Conversion baseline unavailable",
+        DEAD_ZONES_SUMMARY: "Zone activity insight",
+        LOW_DATA_CONFIDENCE: "Limited sample size",
+        NO_EVENTS: "No activity detected"
+      };
+      return titles[type] || (severity === "critical" ? "System issue" : severity === "warning" ? "Attention needed" : "Session insight");
+    }
+
     function renderAlerts(snapshot, session) {
-      const errors = [];
-      if (session && session.error) errors.push(session.error);
-      for (const value of Object.values(snapshot.errors || {})) errors.push(value);
-      for (const anomaly of snapshot.anomalies || []) {
-        const title = anomaly.message || anomaly.anomaly_reason || anomaly.reason || anomaly.type || "Anomaly";
-        const action = anomaly.suggested_action ? ` ${anomaly.suggested_action}` : "";
-        const zone = anomaly.zone_id ? ` (${anomaly.zone_id})` : "";
-        errors.push(`${title}${zone}.${action}`);
+      const items = [];
+      if (session && session.error) {
+        items.push({severity: "critical", title: "Analysis failed", message: session.error});
       }
-      $("alerts").innerHTML = errors.map((item) => `<div class="error-item">${item}</div>`).join("") || `<div class="tiny">No active alerts</div>`;
+      for (const [source, value] of Object.entries(snapshot.errors || {})) {
+        items.push({severity: "critical", title: `${source} error`, message: value});
+      }
+      for (const anomaly of snapshot.anomalies || []) {
+        const rawSeverity = String(anomaly.severity || "INFO").toUpperCase();
+        const severity = rawSeverity === "CRITICAL" || rawSeverity === "ERROR"
+          ? "critical"
+          : rawSeverity === "WARN" || rawSeverity === "WARNING"
+            ? "warning"
+            : rawSeverity === "SUCCESS"
+              ? "success"
+              : "info";
+        items.push({
+          severity,
+          title: alertTitle(anomaly.type, severity),
+          message: anomaly.message || anomaly.anomaly_reason || anomaly.reason || anomaly.type || "Session observation",
+          action: anomaly.suggested_action || ""
+        });
+      }
+
+      const order = {critical: 0, warning: 1, info: 2, success: 3};
+      items.sort((a, b) => order[a.severity] - order[b.severity]);
+      const criticalCount = items.filter((item) => item.severity === "critical").length;
+      const warningCount = items.filter((item) => item.severity === "warning").length;
+      $("alertSummary").textContent = criticalCount
+        ? `${criticalCount} critical`
+        : warningCount
+          ? `${warningCount} warning${warningCount === 1 ? "" : "s"}`
+          : "No critical alerts";
+
+      $("alerts").innerHTML = items.map((item) => `
+        <div class="alert-item ${item.severity}">
+          <div class="alert-heading">
+            <span class="alert-badge">${escapeHtml(item.severity)}</span>
+            <strong>${escapeHtml(item.title)}</strong>
+          </div>
+          <div class="alert-message">${escapeHtml(item.message)}</div>
+          ${item.action ? `<div class="alert-action"><strong>Recommended:</strong> ${escapeHtml(item.action)}</div>` : ""}
+        </div>
+      `).join("") || `
+        <div class="alert-item success">
+          <div class="alert-heading"><span class="alert-badge">Good</span><strong>No critical alerts</strong></div>
+          <div class="alert-message">This session completed without an operational warning.</div>
+        </div>
+      `;
     }
 
     function fallbackProgress(session) {
@@ -3014,7 +3127,7 @@
 
     init().catch((error) => {
       setChip("apiChip", "System failed", "bad");
-      $("alerts").innerHTML = `<div class="error-item">${error.message}</div>`;
+      $("alerts").innerHTML = `<div class="alert-item critical"><div class="alert-heading"><span class="alert-badge">Critical</span><strong>Dashboard failed</strong></div><div class="alert-message">${escapeHtml(error.message)}</div></div>`;
     });
   </script>
 </body>
